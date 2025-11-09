@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
-  MapPin, Globe, Phone, Mail, DollarSign, Clock, Users, 
-  Plane, Star, Check, AlertCircle, Calendar, Award, TrendingUp,
+  MapPin, Globe, Phone, DollarSign, Clock, 
+  Plane, Star, Check, AlertCircle, Award, TrendingUp,
   MessageSquare, Send, ChevronLeft
 } from 'lucide-react';
 import { useSchool, useSchoolPrograms, useSchoolAircraft, useSchoolReviews } from '../hooks/useMarketplace';

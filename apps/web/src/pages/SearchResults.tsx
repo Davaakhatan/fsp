@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { MapPin, Search, SlidersHorizontal, X, DollarSign, Clock, Users, Plane } from 'lucide-react';
+import { MapPin, Search, SlidersHorizontal, DollarSign, Plane } from 'lucide-react';
 import { useSchoolSearch, useGeocoding } from '../hooks/useMarketplace';
 import { TrustBadge } from '../components/TrustBadge';
 import type { SearchFilters, TrustTier, ProgramType, TrainingType } from '@fsp/shared';

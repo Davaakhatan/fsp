@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { useQuery } from '@tanstack/react-query';
-import { Mail, Phone, User, Calendar, MessageSquare, CheckCircle, Clock, XCircle, Filter } from 'lucide-react';
+import { Mail, Phone, Calendar, MessageSquare, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { formatDateTime } from '../lib/utils';
 
 interface Inquiry {

@@ -4,10 +4,8 @@ import {
   Building2, 
   Users, 
   TrendingUp, 
-  AlertCircle,
   CheckCircle,
   Clock,
-  DollarSign,
   Eye,
   Shield
 } from 'lucide-react';
@@ -196,11 +194,11 @@ export const AdminDashboard: React.FC = () => {
                           {school.avg_rating > 0 ? `${school.avg_rating.toFixed(1)}★` : 'N/A'}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {school.total_reviews} reviews
+                          {school.review_count} reviews
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {school.total_programs || 0}
+                        {school.programs_offered?.length || 0}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                         <Link

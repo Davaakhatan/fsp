@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { DollarSign, Calculator, TrendingUp, Award, ExternalLink, Info, CheckCircle2 } from 'lucide-react';
 
 export const FinancingHub: React.FC = () => {
@@ -24,7 +24,7 @@ export const FinancingHub: React.FC = () => {
     fast_track: 3,
     standard: 6,
     flexible: 12,
-  }[trainingPace];
+  }[trainingPace] || 6; // Default to 6 months if undefined
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12">

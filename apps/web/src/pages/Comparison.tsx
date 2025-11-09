@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, X, CheckCircle2, XCircle, DollarSign, Clock, Users, Plane, Star, Award } from 'lucide-react';
 import { useSchoolComparison } from '../hooks/useMarketplace';
 import { TrustBadge } from '../components/TrustBadge';
-import type { SchoolSummary } from '@fsp/shared';
 
 export const Comparison: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
