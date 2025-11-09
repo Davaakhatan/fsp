@@ -2,259 +2,395 @@
 
 ## Why This Exists
 
-### The Problem
-Flight schools operate under constant weather uncertainty. Every day, instructors and schedulers must:
-- Manually check weather forecasts for upcoming lessons
-- Make subjective decisions about flight safety based on student training levels
-- Spend hours making phone calls to reschedule canceled lessons
-- Juggle complex schedules to find alternative time slots
-- Risk student dissatisfaction due to last-minute cancellations
+### The Student Problem
+Prospective pilots starting their flight training journey face:
 
-This manual process is:
-- **Time-consuming**: 15-30 minutes per cancellation
-- **Error-prone**: Human oversight can miss critical weather factors
-- **Inconsistent**: Different instructors may apply different safety standards
-- **Reactive**: Decisions made too late for optimal rescheduling
-- **Untracked**: No data on patterns or optimization opportunities
+**Information Overload**:
+- 500+ flight schools across the US alone
+- Each school's website presents data differently
+- No standard format for costs, timelines, or requirements
+- Outdated information (pricing, fleet, availability)
 
-### The Impact
-- Lost training time affects student progression and satisfaction
-- Instructors lose income from canceled lessons
-- Aircraft sit idle, reducing school revenue
-- Poor customer experience from unclear communication
-- No insights into weather patterns for better planning
+**Decision Paralysis**:
+- How to compare School A at $60k vs School B at $70k?
+- Which program is faster? Part 61 vs Part 141?
+- Which schools have good aircraft availability?
+- Which schools actually deliver on their promises?
+
+**No Trust Signals**:
+- All schools claim to be "the best"
+- No objective quality metrics
+- Reviews are scattered across Google, Yelp, Reddit
+- Hard to verify claimed hours, costs, timelines
+
+**Time-Consuming Research**:
+- Weeks of manual research
+- Calling dozens of schools
+- Spreadsheet management
+- Still uncertain about decision
+
+### The School Problem
+Flight schools struggle to stand out:
+
+**Price-Only Competition**:
+- Race to the bottom on pricing
+- Cannot highlight operational excellence
+- Quality schools lose to cheaper (but worse) options
+
+**No Credibility Mechanism**:
+- "Trust us" marketing doesn't work
+- Cannot prove training velocity or reliability
+- Hard to showcase student outcomes
+
+**Limited Reach**:
+- Local marketing only
+- Word-of-mouth takes time
+- Generic directory listings
+- No differentiation from competitors
+
+**Lead Quality**:
+- Tire-kickers waste time
+- Unqualified inquiries
+- No pre-screening
+- Low conversion rates
 
 ## Who This Serves
 
 ### Primary Users
 
-#### 1. Flight Students
-**Needs:**
-- Advance notice of cancellations
-- Clear explanation of why their flight is canceled
-- Convenient rescheduling options
-- Confidence in safety decisions
+#### 1. Prospective Student Pilots
+**Profile**:
+- Age: 18-45
+- Goal: Career pilot or recreational flying
+- Budget: $10k-$100k+
+- Location: Flexible or location-bound
+- Timeline: 6-24 months
 
-**Pain Points:**
-- Last-minute cancellations disrupt their schedule
-- Uncertainty about when they can fly next
-- Frustration with back-and-forth communication
+**Needs**:
+- Clear, comparable data on all schools
+- Trust signals and quality metrics
+- Personalized recommendations
+- Financing guidance
+- Easy path to next steps (inquiry, tour, discovery flight)
 
-**Success Looks Like:**
-- Notification 24+ hours before scheduled flight
-- 3 concrete rescheduling options presented immediately
-- One-click acceptance of new time slot
-- Clear weather safety information
+**Pain Points**:
+- Overwhelming choice
+- Inconsistent information
+- Fear of making wrong decision
+- Don't know what questions to ask
+- Financing uncertainty
 
-#### 2. Flight Instructors
-**Needs:**
-- Automatic schedule updates
-- Clear view of weather-related changes
-- Reduced administrative burden
-- Confidence in safety standards
+**Success Looks Like**:
+- Finds 3-5 perfect-fit schools in < 30 minutes
+- Understands exact costs and timelines
+- Sees objective quality metrics
+- Gets personalized AI recommendations
+- Books discovery flight with confidence
 
-**Pain Points:**
-- Time wasted on manual weather checks
-- Difficulty coordinating reschedules
-- Lost income from cancellations
-- Liability concerns about weather decisions
+#### 2. Flight Schools (Admins/Owners)
+**Profile**:
+- Small businesses (1-20 aircraft)
+- Competing for students
+- Want to showcase quality
+- Need qualified leads
 
-**Success Looks Like:**
-- Automatic notifications of schedule changes
-- Dashboard showing all affected flights
-- System handles rescheduling coordination
-- Consistent safety standards applied
+**Needs**:
+- Stand out from competition
+- Prove operational excellence
+- Reach more qualified students
+- Manage online reputation
+- Track lead quality
 
-#### 3. Flight School Schedulers
-**Needs:**
-- Overview of all weather conflicts
-- Automated conflict resolution
-- Metrics on cancellations and reschedules
-- Efficient resource utilization
+**Pain Points**:
+- Generic directories
+- Price-only competition
+- Unqualified leads
+- Reputation management
+- No analytics on lead sources
 
-**Pain Points:**
-- Overwhelming manual coordination work
-- No visibility into patterns
-- Difficult to optimize schedules
-- Student complaints about communication
-
-**Success Looks Like:**
-- Dashboard showing all active conflicts
-- AI-suggested reschedules that work for everyone
-- Analytics on weather impact
-- Reduced customer service workload
+**Success Looks Like**:
+- Profile showcases unique strengths
+- Trust badge validates quality
+- Qualified students reach out
+- Analytics show ROI on marketing
+- Premium placement for top performers
 
 ### Secondary Users
 
-#### 4. Flight School Management
-**Needs:**
-- Operational metrics
-- Cost/benefit analysis of weather impacts
-- Student satisfaction data
-- Resource optimization insights
+#### 3. CFIs (Certified Flight Instructors)
+**Needs**:
+- Recommend schools to students
+- Understand market landscape
+- Compare employment opportunities
+
+#### 4. Aviation Industry Partners
+**Needs**:
+- Flight training market intelligence
+- Trends and analytics
+- Partnership opportunities (lenders, equipment vendors)
 
 ## How It Should Work
 
-### User Journey: Student Perspective
+### User Journey: Student Discovery
 
-#### Normal Flow (No Weather Issues)
-1. Student has flight lesson scheduled for Thursday 10am
-2. Receives confirmation reminder 24 hours in advance
-3. Shows up and completes lesson
-4. No system intervention needed
+#### Phase 1: Exploration (5-10 minutes)
+1. **Landing Page**:
+   - Hero: "Find Your Perfect Flight School"
+   - Search bar: "Where do you want to learn to fly?"
+   - Quick stats: "2,500+ schools | 1,000+ verified"
 
-#### Weather Conflict Flow
-1. **Detection** (T-24 hours):
-   - System checks weather for Thursday 10am flight
-   - Detects high winds (15kt) exceeding Student Pilot minimums (10kt)
-   - Flags flight as unsafe
+2. **Initial Search**:
+   - Student enters location (city, zip, or state)
+   - System shows nearby schools on map + list
+   - Filters available: Program, Budget, Fleet Type
 
-2. **Notification** (Within 1 minute):
-   - Student receives email: "Your Thursday 10am flight has been canceled due to weather"
-   - Clear explanation: "Wind speeds of 15kt exceed safe limits for Student Pilots (10kt max)"
-   - Email includes 3 AI-suggested alternative times
+3. **Browse Results**:
+   - Card view with key info:
+     - School name + Trust Tier badge
+     - Programs offered
+     - Price range (e.g., "$50k-$65k PPL→CPL")
+     - Fleet size and types
+     - Distance from student
+   - Sort by: Distance, Price, Rating, Training Velocity
 
-3. **Rescheduling Options**:
-   ```
-   Option 1: Thursday 2pm (winds forecasted at 8kt)
-   Option 2: Friday 10am (calm conditions)
-   Option 3: Saturday 9am (perfect weather window)
-   ```
+#### Phase 2: Comparison (10-15 minutes)
+4. **Select Schools to Compare**:
+   - Student checks 2-4 schools
+   - Clicks "Compare Selected"
 
-4. **Confirmation** (Student clicks option):
-   - Student selects Friday 10am
-   - System immediately books new slot
-   - Instructor notified automatically
-   - Confirmation email sent to student
+5. **Side-by-Side Comparison**:
+   - Table format with normalized data:
+     - **Cost**: Total expected cost with breakdown
+     - **Timeline**: Avg months to completion
+     - **Fleet**: Aircraft types, quantity, simulator
+     - **Instructors**: Count, ratio, turnover
+     - **Trust Tier**: Badge + explanation
+     - **Reviews**: Aggregate rating + count
 
-### User Journey: Instructor Perspective
+6. **Deep Dive into Profiles**:
+   - Click school name → Full profile page:
+     - **Overview**: Description, programs, location
+     - **Evidence Panel**: Trust Tier details, verified facts
+     - **Pricing**: Detailed cost breakdown with assumptions
+     - **Fleet**: Photos, specs, availability
+     - **Instructors**: Bios, credentials
+     - **Reviews**: Student testimonials with verification
+     - **Photos**: Facilities, aircraft, classrooms
+     - **FAQ**: Common questions answered
 
-1. **Morning Dashboard Check**:
-   - Instructor logs into dashboard
-   - Sees weather alerts panel
-   - Views: "2 flights flagged for weather review"
+#### Phase 3: AI Matching (5 minutes)
+7. **Student Takes Questionnaire**:
+   - "Help us find your perfect match"
+   - Questions:
+     - What's your goal? (Career / Recreational / Specific rating)
+     - What's your budget? (slider: $10k-$150k)
+     - How flexible is your location? (Local / Regional / Anywhere)
+     - What's your timeline? (Fast-track / Standard / Flexible)
+     - What's your schedule? (Full-time / Part-time / Weekends)
+     - Aircraft preference? (Cessna / Piper / No preference)
+     - Financing needed? (Yes / No / Exploring)
 
-2. **Conflict Review**:
-   - Sees affected students and reasons
-   - Reviews AI-suggested reschedule options
-   - Can override system recommendations if needed
+8. **AI Generates Ranked Matches**:
+   - Top 5 schools with scores
+   - For each school, AI provides:
+     - **Match Score**: 92/100
+     - **Why It's a Good Fit**: "Close to your location, fits budget, strong Part 141 program for career-track students"
+     - **Key Differences**: "School A is 15% faster but 10% more expensive than School B"
+     - **Next Steps**: "Book a discovery flight" / "Request a tour"
 
-3. **Automatic Updates**:
-   - When students accept reschedules, calendar auto-updates
-   - No manual entry needed
-   - Gets summary notification of all changes
+#### Phase 4: Conversion (1-2 minutes)
+9. **Take Action**:
+   - Click "Request Information" → Form sent to school
+   - Click "Book Discovery Flight" → Calendar integration
+   - Click "Check Financing" → Affordability calculator
 
-### User Journey: Scheduler Perspective
+10. **Affordability Calculator**:
+    - Enter total cost
+    - Select training pace (full-time / part-time)
+    - Add financing details (down payment, interest rate)
+    - See monthly payment estimate
+    - Adjust sliders for fuel price, training pace changes
+    - Get breakdown of costs over time
 
-1. **Dashboard Overview**:
-   - Views active flights for next 48 hours
-   - Sees weather alerts by location
-   - Monitors notification status
+11. **Confirmation**:
+    - "Your inquiry has been sent to [School Name]"
+    - "They'll respond within 24 hours"
+    - Save search and matches for later
 
-2. **Conflict Management**:
-   - Reviews AI-suggested reschedules
-   - Can manually adjust if needed
-   - Tracks acceptance rate of suggestions
+### User Journey: School Claiming Profile
 
-3. **Analytics**:
-   - Views metrics on conflicts detected
-   - Sees average rescheduling time
-   - Identifies weather pattern insights
+#### Phase 1: Discovery (2 minutes)
+1. **School Finds Listing**:
+   - Search for their school name
+   - See unclaimed profile with public data
+
+2. **Claim Prompt**:
+   - Banner: "Is this your school? Claim this profile to update information and receive leads"
+   - Click "Claim This Profile"
+
+#### Phase 2: Verification (5-10 minutes)
+3. **Verification Process**:
+   - Enter business email (must match domain)
+   - Upload business documentation (business license, insurance)
+   - Verify ownership (email confirmation)
+
+4. **Profile Enrichment**:
+   - Review existing data
+   - Correct any inaccuracies
+   - Add missing information:
+     - Detailed program descriptions
+     - Accurate pricing with assumptions
+     - Fleet details and photos
+     - Instructor bios
+     - Facility photos
+     - FAQ responses
+
+5. **Trust Tier Eligibility**:
+   - System checks if school uses FSP
+   - If yes, shows path to "Verified FSP School" badge
+   - If no, offers "Community-Verified" status
+
+#### Phase 3: Subscription (Optional)
+6. **Upgrade Prompt**:
+   - Free tier limitations:
+     - Basic profile
+     - Limited lead volume (5/month)
+     - No analytics
+   
+   - Plus tier benefits ($99/month):
+     - Rich profile with photos, videos, FAQs
+     - Unlimited leads
+     - CRM integration
+     - Call tracking
+     - Financing widget
+     - Full analytics
+
+   - Premier tier benefits ($299/month):
+     - All Plus features
+     - Prominent placement in search results
+     - Deep analytics (training velocity vs cohort)
+     - Scholarship co-promotion
+     - Priority support
+
+7. **Payment & Activation**:
+   - Enter payment details
+   - Activate subscription
+   - Profile goes live
+
+#### Phase 4: Management (Ongoing)
+8. **Dashboard Access**:
+   - View leads received
+   - Track inquiry-to-tour conversion
+   - Update profile information
+   - Respond to reviews
+   - View analytics
 
 ## Core Features
 
-### 1. Weather Intelligence
-- **Multi-point monitoring**: Departure, destination, and flight path
-- **Training-level awareness**: Different minimums for different pilots
-- **Forecast integration**: Look ahead 24-48 hours
-- **Condition breakdown**: Visibility, ceiling, winds, precipitation, storms
+### 1. Advanced Search & Filters
+- **Location-Based**: Map + radius search
+- **Program Filters**: PPL, IR, CPL, CFI, ATP, Part 61, Part 141
+- **Budget Filters**: Price ranges, financing available
+- **Fleet Filters**: Aircraft types, simulators
+- **Training Type**: Full-time, part-time, accelerated
+- **Trust Tier**: Filter by badge level
 
-### 2. AI Rescheduling Engine
-- **Smart suggestions**: Consider availability, weather, training progression
-- **Multiple options**: Always provide 3+ alternatives
-- **Constraint satisfaction**: Respect instructor schedules, aircraft availability
-- **Learning capability**: Improve suggestions based on acceptance patterns
+### 2. School Profile System
+- **Comprehensive Data**: All normalized fields
+- **Trust Badges**: Visual indicators of verification level
+- **Evidence Panel**: Transparent display of verified facts
+- **Photo Gallery**: Facilities, aircraft, instructors
+- **Review System**: Verified student reviews with ratings
+- **FAQ Section**: School-specific Q&A
 
-### 3. Notification System
-- **Multi-channel**: Email + in-app (SMS as bonus)
-- **Real-time delivery**: Within 1 minute of detection
-- **Clear messaging**: Explain why and offer solutions
-- **Confirmation tracking**: Know when messages are received/read
+### 3. AI Matching Engine
+- **Smart Questionnaire**: Captures student goals, constraints, preferences
+- **Embedding Models**: Semantic matching of student needs to school strengths
+- **LLM Reasoning**: Plain-English explanations of why schools are good fits
+- **Ranked Results**: Top 5 matches with scores
+- **Comparative Analysis**: "School A vs School B" breakdowns
 
-### 4. Central Dashboard
-- **Weather alerts**: Live conditions and forecasts
-- **Flight status**: Scheduled, In-Flight, Canceled, Rescheduled
-- **Conflict queue**: Pending reschedules awaiting confirmation
-- **Quick actions**: Approve, modify, or override AI suggestions
+### 4. Comparison Tool
+- **Side-by-Side View**: Up to 4 schools at once
+- **Normalized Data**: Apples-to-apples comparison
+- **Visual Indicators**: Icons, badges, charts
+- **Export**: PDF or email comparison report
 
-### 5. Data & Analytics
-- **Booking lifecycle**: Track from creation to completion or cancellation
-- **Metrics tracking**: All key performance indicators
-- **Pattern recognition**: Identify weather trends
-- **Reporting**: Generate operational insights
+### 5. Financing Hub
+- **Affordability Calculator**: Monthly payment estimator
+- **Lender Directory**: Integrated lender profiles
+- **Pre-Qualification**: Soft-pull credit checks (future)
+- **VA/Funding Flags**: Eligibility indicators
+- **Scholarship Directory**: Available scholarships
 
-## User Experience Goals
+### 6. Trust Tier System
+- **Premier**: 🥇 Meets FSP benchmarks (training velocity, reliability, satisfaction)
+- **Verified FSP**: ✅ Cross-checked against FSP operational data
+- **Community**: 🤝 Claimed profile, verified docs
+- **Unverified**: No badge, crawled data only
 
-### Simplicity
-- One-click rescheduling for students
-- Automatic updates for instructors
-- Clear, jargon-free communication
-
-### Reliability
-- 99%+ uptime for weather monitoring
-- Accurate conflict detection
-- Dependable notification delivery
-
-### Transparency
-- Clear explanation of cancellation reasons
-- Show weather data that triggered decision
-- Visible status of all actions
-
-### Speed
-- Notifications within 1 minute
-- AI suggestions generated in seconds
-- Dashboard updates in real-time
-
-### Safety First
-- Conservative weather minimums
-- Training-level appropriate decisions
-- Clear safety messaging
-
-## Key Workflows
-
-### Workflow 1: Hourly Weather Check
-```
-[Scheduler runs] → [Fetch upcoming flights] → [Get weather for each location] 
-→ [Apply training level logic] → [Detect conflicts] → [Trigger notifications]
-```
-
-### Workflow 2: Conflict Resolution
-```
-[Conflict detected] → [AI generates options] → [Notify student + instructor]
-→ [Student selects option] → [Update database] → [Confirm to all parties]
-```
-
-### Workflow 3: Manual Override
-```
-[Scheduler reviews conflict] → [Disagrees with AI] → [Manually reschedules]
-→ [System logs override] → [Notifies parties] → [Updates dashboard]
-```
+### 7. Lead Management (School Side)
+- **Inquiry Tracking**: Dashboard for all leads
+- **CRM Integration**: Push leads to school's CRM
+- **Call Tracking**: Phone numbers for attribution
+- **Analytics**: Lead source, conversion rates
+- **Response Templates**: Quick reply to common questions
 
 ## Design Principles
 
-1. **Safety Over Convenience**: Never compromise on weather minimums
-2. **Automation Over Manual**: Minimize human intervention needed
-3. **Intelligence Over Rules**: Use AI for complex scheduling decisions
-4. **Transparency Over Black Box**: Always explain system decisions
-5. **Proactive Over Reactive**: Detect issues 24+ hours in advance
-6. **Data Over Intuition**: Track everything for continuous improvement
+### 1. Clarity Over Clutter
+- Clean, spacious layouts
+- One primary action per screen
+- Progressive disclosure of information
+
+### 2. Trust Through Transparency
+- Always explain Trust Tier badges
+- Show data sources and timestamps
+- Admit when data is incomplete or unverified
+
+### 3. Student-First
+- Optimize for student decision-making
+- No school bias or pay-for-placement (except Premier tier)
+- Honest comparisons, even if unfavorable
+
+### 4. Mobile-Responsive
+- 50%+ of users on mobile
+- Touch-friendly interfaces
+- Fast load times
+
+### 5. Data-Driven
+- Track everything
+- A/B test major changes
+- Continuous improvement based on user behavior
+
+## User Experience Goals
+
+### Speed
+- Search results in < 1 second
+- Profile pages load in < 2 seconds
+- AI matching in < 30 seconds
+
+### Simplicity
+- 3 clicks to comparison view
+- 1 click to inquiry submission
+- Zero jargon without explanations
+
+### Confidence
+- Clear trust signals
+- Verified data with sources
+- Student reviews with verification
+
+### Delight
+- Beautiful, modern UI
+- Smooth animations
+- Celebratory moments (finding a match!)
 
 ## Non-Goals (What This Isn't)
 
-- ❌ Full flight school management system
-- ❌ Financial management or billing
-- ❌ Aircraft maintenance tracking
-- ❌ Student training curriculum management
-- ❌ Replacement for weather briefing services
-- ❌ Pilot decision-making tool for real-time weather
-
+- ❌ Full flight training CRM
+- ❌ Student learning management system
+- ❌ Scheduling/booking platform (initially)
+- ❌ Financial transactions or payments
+- ❌ Job placement service
+- ❌ Aircraft marketplace
+- ❌ Flight school operational management
