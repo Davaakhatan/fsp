@@ -56,7 +56,7 @@ BEGIN
       aircraft_id, 
       departure_location_id, 
       destination_location_id,
-      scheduled_time, 
+      scheduled_at, 
       duration_minutes, 
       status,
       notes
@@ -81,7 +81,7 @@ BEGIN
       aircraft_id, 
       departure_location_id, 
       destination_location_id,
-      scheduled_time, 
+      scheduled_at, 
       duration_minutes, 
       status,
       notes
@@ -110,7 +110,7 @@ BEGIN
       aircraft_id, 
       departure_location_id, 
       destination_location_id,
-      scheduled_time, 
+      scheduled_at, 
       duration_minutes, 
       status,
       notes
@@ -138,27 +138,22 @@ BEGIN
   FOR location_rec IN SELECT id FROM locations LOOP
     INSERT INTO weather_conditions (
       location_id,
-      temperature,
-      wind_speed,
-      wind_direction,
-      visibility,
-      ceiling,
-      conditions,
-      timestamp
+      timestamp,
+      visibility_sm,
+      ceiling_ft,
+      wind_speed_kt,
+      wind_gust_kt,
+      temperature_c,
+      is_safe_for_training
     ) VALUES (
       location_rec.id,
-      15 + (RANDOM() * 10), -- 15-25°C
-      5 + (RANDOM() * 15),  -- 5-20 knots
-      (RANDOM() * 360)::INTEGER,
-      10,  -- 10 statute miles
-      3000 + (RANDOM() * 5000)::INTEGER,
-      CASE (RANDOM() * 4)::INTEGER
-        WHEN 0 THEN 'Clear'
-        WHEN 1 THEN 'Few Clouds'
-        WHEN 2 THEN 'Scattered Clouds'
-        ELSE 'Broken Clouds'
-      END,
-      NOW()
+      NOW(),
+      8 + (RANDOM() * 4),  -- 8-12 SM visibility
+      2500 + (RANDOM() * 3000)::INTEGER,  -- 2500-5500 ft ceiling
+      8 + (RANDOM() * 12)::INTEGER,  -- 8-20 knots wind
+      12 + (RANDOM() * 8)::INTEGER,  -- 12-20 knots gusts
+      15 + (RANDOM() * 10),  -- 15-25°C
+      true
     );
   END LOOP;
 END $$;
@@ -166,23 +161,25 @@ END $$;
 -- Insert a sample weather alert (optional - for testing)
 DO $$
 DECLARE
-  first_booking_id UUID;
+  first_location_id UUID;
 BEGIN
-  SELECT id INTO first_booking_id FROM flight_bookings ORDER BY scheduled_time LIMIT 1;
+  SELECT id INTO first_location_id FROM locations LIMIT 1;
   
-  IF first_booking_id IS NOT NULL THEN
+  IF first_location_id IS NOT NULL THEN
     INSERT INTO weather_alerts (
-      booking_id,
+      location_id,
       severity,
-      violated_minimums,
-      current_conditions,
-      detected_at
+      title,
+      description,
+      affected_bookings_count,
+      is_active
     ) VALUES (
-      first_booking_id,
+      first_location_id,
       'MEDIUM',
-      ARRAY['Visibility below 5 SM', 'Ceiling below 3000 ft'],
-      '{"visibility": 4, "ceiling": 2500, "wind_speed": 18}'::JSONB,
-      NOW()
+      'Low Visibility Warning',
+      'Visibility has dropped below VFR minimums. Consider IFR operations or delay flights.',
+      2,
+      true
     );
   END IF;
 END $$;
