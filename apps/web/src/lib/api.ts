@@ -89,11 +89,15 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
   const { data, error } = await query;
 
   if (error) {
-    console.error('Error searching schools:', error);
+    console.error('❌ Error searching schools:', error);
+    console.error('   Error details:', JSON.stringify(error, null, 2));
     throw new Error(error.message);
   }
 
   console.log('✅ Search results:', data?.length, 'schools found');
+  if (isUsingRPC && data && data.length > 0) {
+    console.log('   First school:', data[0].name, 'at', data[0].distance_miles, 'miles');
+  }
   return data || [];
 }
 
