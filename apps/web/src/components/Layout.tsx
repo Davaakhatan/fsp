@@ -21,6 +21,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   const portalLinks = [
     { path: '/portal/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/portal/inquiries', label: 'Inquiries', icon: Mail },
     { path: '/portal/bookings', label: 'Bookings', icon: Calendar },
     { path: '/portal/weather', label: 'Weather Alerts', icon: CloudRain },
   ];
