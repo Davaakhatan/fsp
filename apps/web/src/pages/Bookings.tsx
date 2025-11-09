@@ -415,9 +415,14 @@ export default function Bookings() {
                       type="datetime-local"
                       value={formData.scheduledTime}
                       onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
+                      min={new Date().toISOString().slice(0, 16)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       required
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Select date and time for your flight lesson
+                    </p>
+                  </div>
                   </div>
 
                   {/* Departure Location */}
