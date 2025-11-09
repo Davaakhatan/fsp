@@ -1,17 +1,26 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tantml:react-query';
 import { Booking } from '@fsp/shared';
+import { supabase } from '../lib/supabase';
 
-// API base URL
-const API_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5175';
-
-// Fetch bookings
+// Fetch bookings directly from Supabase
 export function useBookings() {
   return useQuery({
     queryKey: ['bookings'],
     queryFn: async () => {
-      const response = await fetch(`${API_URL}/api/bookings`);
-      if (!response.ok) throw new Error('Failed to fetch bookings');
-      return response.json() as Promise<Booking[]>;
+      const { data, error } = await supabase
+        .from('flight_bookings')
+        .select(`
+          *,
+          student:students(*),
+          instructor:instructors(*),
+          aircraft:aircraft(*),
+          departure_location:locations!flight_bookings_departure_location_id_fkey(*),
+          destination_location:locations!flight_bookings_destination_location_id_fkey(*)
+        `)
+        .order('scheduled_at', { ascending: true });
+      
+      if (error) throw error;
+      return data as any[];
     },
   });
 }
