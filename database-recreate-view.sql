@@ -28,7 +28,7 @@ SELECT
   s.fsp_schedule_reliability,
   s.fsp_student_satisfaction,
   COUNT(DISTINCT p.id) as total_programs,
-  COALESCE(AVG(r.rating_overall), 0) as avg_rating,
+  COALESCE(AVG(r.rating), 0) as avg_rating,
   COUNT(DISTINCT r.id) as total_reviews,
   MIN(p.min_total_cost) as min_program_cost,
   MAX(p.max_total_cost) as max_program_cost
