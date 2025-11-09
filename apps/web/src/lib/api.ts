@@ -18,6 +18,8 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
     // PostGIS distance query - use RPC directly
     const radiusMeters = filters.radius_miles * 1609.34;
     console.log('📍 Using PostGIS radius search');
+    console.log('   Coordinates:', filters.latitude, filters.longitude);
+    console.log('   Radius:', filters.radius_miles, 'miles =', radiusMeters, 'meters');
     query = supabase.rpc('schools_within_radius', {
       search_lat: filters.latitude,
       search_lon: filters.longitude,
