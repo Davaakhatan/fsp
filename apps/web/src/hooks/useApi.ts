@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tantml:react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Booking } from '@fsp/shared';
 import { supabase } from '../lib/supabase';
 
@@ -25,69 +25,51 @@ export function useBookings() {
   });
 }
 
-// Fetch single booking
-export function useBooking(id: string) {
-  return useQuery({
-    queryKey: ['booking', id],
-    queryFn: async () => {
-      const response = await fetch(`${API_URL}/api/bookings/${id}`);
-      if (!response.ok) throw new Error('Failed to fetch booking');
-      return response.json() as Promise<Booking>;
-    },
-    enabled: !!id,
-  });
-}
-
-// Create booking mutation
-export function useCreateBooking() {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async (data: {
-      studentId: string;
-      instructorId: string;
-      aircraftId: string;
-      departureLocationId: string;
-      destinationLocationId?: string;
-      scheduledTime: string;
-      durationMinutes: number;
-    }) => {
-      const response = await fetch(`${API_URL}/api/bookings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to create booking');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
-    },
-  });
-}
-
-// Fetch weather alerts
+// Fetch weather alerts directly from Supabase
 export function useWeatherAlerts() {
   return useQuery({
     queryKey: ['weather-alerts'],
     queryFn: async () => {
-      const response = await fetch(`${API_URL}/api/weather/alerts`);
-      if (!response.ok) throw new Error('Failed to fetch alerts');
-      return response.json();
+      const { data, error } = await supabase
+        .from('weather_alerts')
+        .select(`
+          *,
+          location:locations(*)
+        `)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data as any[];
     },
     refetchInterval: 60000, // Refetch every minute
   });
 }
 
-// Fetch dashboard stats
+// Fetch dashboard stats directly from Supabase
 export function useDashboardStats() {
   return useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      const response = await fetch(`${API_URL}/api/dashboard/stats`);
-      if (!response.ok) throw new Error('Failed to fetch stats');
-      return response.json();
+      // Get counts from Supabase
+      const [bookingsRes, alertsRes] = await Promise.all([
+        supabase.from('flight_bookings').select('*', { count: 'exact', head: true }),
+        supabase.from('weather_alerts').select('*', { count: 'exact', head: true }).eq('is_active', true),
+      ]);
+      
+      const today = new Date().toISOString().split('T')[0];
+      const { count: todayCount } = await supabase
+        .from('flight_bookings')
+        .select('*', { count: 'exact', head: true })
+        .gte('scheduled_at', `${today}T00:00:00`)
+        .lte('scheduled_at', `${today}T23:59:59`);
+      
+      return {
+        totalBookings: bookingsRes.count || 0,
+        weatherAlerts: alertsRes.count || 0,
+        todayBookings: todayCount || 0,
+        activeFlights: 15, // Mock data for now
+      };
     },
   });
 }
-
