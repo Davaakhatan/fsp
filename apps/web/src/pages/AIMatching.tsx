@@ -371,7 +371,7 @@ export const AIMatching: React.FC = () => {
                     min={currentQuestion.min}
                     max={currentQuestion.max}
                     step={currentQuestion.step}
-                    value={answers[currentQuestion.id as keyof QuestionnaireAnswers] || currentQuestion.min}
+                    value={Number(answers[currentQuestion.id as keyof QuestionnaireAnswers]) || currentQuestion.min}
                     onChange={(e) => updateAnswer(currentQuestion.id as keyof QuestionnaireAnswers, Number(e.target.value))}
                     className="w-full h-3 bg-blue-200 rounded-lg appearance-none cursor-pointer"
                   />

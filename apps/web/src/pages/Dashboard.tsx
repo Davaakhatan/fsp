@@ -11,7 +11,7 @@ import { useDashboardStats, useBookings, useWeatherAlerts } from '../hooks/useAp
 import { formatTime } from '@fsp/shared';
 
 export default function Dashboard() {
-  const { data: stats, isLoading: statsLoading } = useDashboardStats();
+  const { data: stats } = useDashboardStats();
   const { data: bookings, isLoading: bookingsLoading } = useBookings();
   const { data: alerts, isLoading: alertsLoading } = useWeatherAlerts();
 
