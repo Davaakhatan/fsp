@@ -66,7 +66,7 @@ export default function WeatherAlerts() {
 
   const handleGenerateOptions = async () => {
     if (!selectedAlert?.booking?.id) {
-      showToast('error', 'No booking found for this alert');
+      showToast('error', 'This alert has no associated booking. Create a new booking to test AI rescheduling!');
       return;
     }
 
