@@ -22,21 +22,34 @@ interface Review {
   rating_support: number | null;
   is_approved: boolean;
   created_at: string;
+  school?: {
+    id: string;
+    name: string;
+    city: string;
+    state: string;
+  };
 }
 
 const Reviews: React.FC = () => {
-  const { schoolId, isSchoolAdmin, loading: authLoading } = useAuth();
+  const { schoolId, isSchoolAdmin, isAdmin, loading: authLoading } = useAuth();
   const queryClient = useQueryClient();
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved'>('pending');
 
   const { data: reviews, isLoading: reviewsLoading } = useQuery<Review[]>({
-    queryKey: ['admin-reviews', schoolId, filterStatus],
+    queryKey: ['admin-reviews', schoolId, filterStatus, isAdmin],
     queryFn: async () => {
-      if (!schoolId) return [];
       let query = supabase
         .from('reviews')
-        .select('*')
-        .eq('school_id', schoolId);
+        .select(`
+          *,
+          school:schools(id, name, city, state)
+        `);
+      
+      // Platform admins see ALL reviews from ALL schools
+      // School admins see only their school's reviews
+      if (!isAdmin && schoolId) {
+        query = query.eq('school_id', schoolId);
+      }
       
       if (filterStatus === 'pending') {
         query = query.eq('is_approved', false);
@@ -49,7 +62,7 @@ const Reviews: React.FC = () => {
       if (error) throw error;
       return data;
     },
-    enabled: isSchoolAdmin && !!schoolId && !authLoading,
+    enabled: (isSchoolAdmin || isAdmin) && !authLoading,
   });
 
   const approveReviewMutation = useMutation({
@@ -96,7 +109,7 @@ const Reviews: React.FC = () => {
     );
   };
 
-  if (authLoading || !isSchoolAdmin) {
+  if (authLoading || !(isSchoolAdmin || isAdmin)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
@@ -104,7 +117,9 @@ const Reviews: React.FC = () => {
     );
   }
 
-  if (!schoolId) {
+  // Platform admins don't need a schoolId (they see all schools)
+  // School admins need a schoolId
+  if (!isAdmin && !schoolId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md">
@@ -124,7 +139,11 @@ const Reviews: React.FC = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Review Moderation</h1>
-          <p className="text-gray-600">Review and approve student feedback for your school</p>
+          <p className="text-gray-600">
+            {isAdmin 
+              ? 'Review and approve student feedback for all schools' 
+              : 'Review and approve student feedback for your school'}
+          </p>
         </div>
 
         {/* Stats */}
@@ -166,6 +185,12 @@ const Reviews: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">{review.student_name}</h3>
+                      {/* Show school name for platform admins */}
+                      {isAdmin && review.school && (
+                        <p className="text-sm font-medium text-blue-600 mt-1">
+                          {review.school.name} - {review.school.city}, {review.school.state}
+                        </p>
+                      )}
                       <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                         {review.student_email && (
                           <span className="flex items-center gap-1">
