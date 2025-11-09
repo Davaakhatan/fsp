@@ -2,16 +2,19 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { UserPlus, Mail, Lock, AlertCircle, Loader2, Plane, Building2, User } from 'lucide-react';
+import { useSchools } from '../hooks/useMarketplace';
+import { supabase } from '../lib/supabase';
 
 export const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const { signUp } = useAuth();
+  const { data: schools, isLoading: schoolsLoading } = useSchools({});
   
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
-    schoolName: '',
+    schoolId: '',
     contactName: '',
   });
   const [error, setError] = useState('');
@@ -33,25 +36,51 @@ export const SignUp: React.FC = () => {
       return;
     }
 
+    if (!formData.schoolId) {
+      setError('Please select a school');
+      return;
+    }
+
     setLoading(true);
 
-    const { error } = await signUp(formData.email, formData.password, {
-      school_name: formData.schoolName,
+    // Sign up user
+    const { error: signUpError, data } = await signUp(formData.email, formData.password, {
       contact_name: formData.contactName,
+      role: 'school_admin', // Set role to school_admin
     });
 
-    if (error) {
-      setError(error.message);
+    if (signUpError) {
+      setError(signUpError.message);
       setLoading(false);
-    } else {
-      setSuccess(true);
-      setTimeout(() => {
-        navigate('/signin');
-      }, 2000);
+      return;
     }
+
+    // Link user to school in school_admins table
+    if (data?.user) {
+      const { error: linkError } = await supabase
+        .from('school_admins')
+        .insert({
+          user_id: data.user.id,
+          school_id: formData.schoolId,
+          role: 'admin',
+          is_primary: false,
+        });
+
+      if (linkError) {
+        console.error('Error linking user to school:', linkError);
+        setError('Account created but failed to link to school. Please contact support.');
+        setLoading(false);
+        return;
+      }
+    }
+
+    setSuccess(true);
+    setTimeout(() => {
+      navigate('/signin');
+    }, 2000);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -107,22 +136,33 @@ export const SignUp: React.FC = () => {
             )}
 
             <div>
-              <label htmlFor="schoolName" className="block text-sm font-medium text-gray-700 mb-2">
-                School Name
+              <label htmlFor="schoolId" className="block text-sm font-medium text-gray-700 mb-2">
+                Select Your School
               </label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  id="schoolName"
-                  name="schoolName"
-                  type="text"
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+                <select
+                  id="schoolId"
+                  name="schoolId"
                   required
-                  value={formData.schoolName}
+                  value={formData.schoolId}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="Phoenix Flight Academy"
-                />
+                  disabled={schoolsLoading}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all appearance-none bg-white disabled:opacity-50"
+                >
+                  <option value="">
+                    {schoolsLoading ? 'Loading schools...' : 'Select a school...'}
+                  </option>
+                  {schools?.map((school) => (
+                    <option key={school.id} value={school.id}>
+                      {school.name} - {school.city}, {school.state}
+                    </option>
+                  ))}
+                </select>
               </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Don't see your school? <Link to="/contact" className="text-blue-600 hover:text-blue-500">Contact us</Link>
+              </p>
             </div>
 
             <div>
