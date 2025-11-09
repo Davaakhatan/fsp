@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Booking } from '@fsp/shared';
 
 // API base URL
-const API_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5175';
 
 // Fetch bookings
 export function useBookings() {
