@@ -319,7 +319,7 @@ export const SchoolProfile: React.FC = () => {
                     <div className="text-right">
                       <p className="text-sm text-gray-600">Cost Range</p>
                       <p className="text-2xl font-bold text-gray-900">
-                        ${(program.min_total_cost / 1000).toFixed(0)}k - ${(program.max_total_cost || program.min_total_cost) / 1000).toFixed(0)}k
+                        ${(program.min_total_cost / 1000).toFixed(0)}k - ${((program.max_total_cost || program.min_total_cost) / 1000).toFixed(0)}k
                       </p>
                     </div>
                   )}
