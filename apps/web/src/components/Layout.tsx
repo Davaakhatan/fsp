@@ -1,89 +1,136 @@
-import { ReactNode } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Plane, AlertCircle, Calendar, LayoutDashboard } from 'lucide-react';
-import { clsx } from 'clsx';
+import { Search, Sparkles, Calculator, Menu, X } from 'lucide-react';
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-export default function Layout({ children }: LayoutProps) {
+export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
-  const navigation = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Bookings', href: '/bookings', icon: Calendar },
-    { name: 'Weather Alerts', href: '/alerts', icon: AlertCircle },
+  const isActive = (path: string) => location.pathname === path;
+
+  const navLinks = [
+    { path: '/search', label: 'Browse Schools', icon: Search },
+    { path: '/find-match', label: 'Find My Match', icon: Sparkles },
+    { path: '/financing', label: 'Financing', icon: Calculator },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg group-hover:shadow-xl transition-shadow">
-                <Plane className="h-7 w-7 text-white" />
+            <Link to="/" className="flex items-center space-x-2 group">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all group-hover:scale-105">
+                <span className="text-white font-bold text-xl">FSP</span>
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                  Flight Schedule Pro
-                </h1>
-                <p className="text-xs text-gray-500">Weather Management System</p>
+              <div className="hidden sm:block">
+                <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  Flight School Pro
+                </div>
+                <div className="text-xs text-gray-500 -mt-1">Find Your Perfect School</div>
               </div>
             </Link>
 
-            {/* Navigation */}
-            <nav className="flex items-center gap-2">
-              {navigation.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.href;
-                
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={clsx(
-                      'flex items-center gap-2 px-6 py-3 rounded-xl transition-all font-medium relative',
-                      isActive
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 scale-105'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 hover:scale-105'
-                    )}
-                  >
-                    <Icon className={clsx('h-5 w-5', isActive && 'animate-pulse')} />
-                    <span className="hidden sm:inline">{item.name}</span>
-                    {isActive && (
-                      <span className="absolute -bottom-px left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full" />
-                    )}
-                  </Link>
-                );
-              })}
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-1">
+              {navLinks.map(({ path, label, icon: Icon }) => (
+                <Link
+                  key={path}
+                  to={path}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all ${
+                    isActive(path)
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{label}</span>
+                </Link>
+              ))}
             </nav>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-200 bg-white">
+            <nav className="px-4 py-4 space-y-2">
+              {navLinks.map(({ path, label, icon: Icon }) => (
+                <Link
+                  key={path}
+                  to={path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all ${
+                    isActive(path)
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{label}</span>
+                </Link>
+              ))}
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
-      <main>
-        {children}
-      </main>
+      <main className="min-h-[calc(100vh-4rem)]">{children}</main>
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-500">
-              © 2025 Flight Schedule Pro. All rights reserved.
-            </p>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-              <span className="text-sm text-gray-600">System Operational</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Brand */}
+            <div className="md:col-span-2">
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">FSP</span>
+                </div>
+                <div className="text-lg font-bold text-gray-900">Flight School Pro</div>
+              </div>
+              <p className="text-gray-600 text-sm max-w-md">
+                Find and compare flight schools across North America. Discover the perfect training program for your aviation goals.
+              </p>
             </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">For Students</h3>
+              <ul className="space-y-2 text-sm">
+                <li><Link to="/search" className="text-gray-600 hover:text-blue-600 transition-colors">Browse Schools</Link></li>
+                <li><Link to="/find-match" className="text-gray-600 hover:text-blue-600 transition-colors">Find My Match</Link></li>
+                <li><Link to="/financing" className="text-gray-600 hover:text-blue-600 transition-colors">Financing Options</Link></li>
+              </ul>
+            </div>
+
+            {/* School Links */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">For Schools</h3>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Claim Your Profile</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Pricing</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Contact Us</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 mt-8 pt-8 text-center text-sm text-gray-600">
+            <p>&copy; 2025 Flight School Pro. All rights reserved.</p>
           </div>
         </div>
       </footer>
     </div>
   );
-}
+};
