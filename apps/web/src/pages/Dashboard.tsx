@@ -105,13 +105,13 @@ export default function Dashboard() {
                     <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
                       <h4 className="font-medium text-red-900">
-                        Weather Conflict - {alert.location}
+                        Weather Conflict - {alert.booking?.location || 'Unknown Location'}
                       </h4>
                       <p className="text-sm text-red-700 mt-1">
-                        {alert.student} - {formatDateTime(alert.scheduledTime)}
+                        {alert.booking?.studentName || 'Unknown Student'} - {formatDateTime(alert.booking?.scheduledTime || new Date())}
                       </p>
                       <p className="text-xs text-red-600 mt-2">
-                        {alert.violatedMinimums.join(', ')}
+                        {alert.violatedMinimums?.join(', ') || 'Weather minimums violated'}
                       </p>
                     </div>
                   </div>
