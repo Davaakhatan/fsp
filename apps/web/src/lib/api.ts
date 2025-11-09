@@ -245,6 +245,40 @@ export async function submitInquiry(inquiry: {
 }
 
 // =====================================================
+// REVIEWS
+// =====================================================
+
+export async function submitReview(review: {
+  school_id: string;
+  reviewer_name: string;
+  overall_rating: number;
+  instruction_rating?: number;
+  aircraft_rating?: number;
+  facilities_rating?: number;
+  value_rating?: number;
+  review_text: string;
+  would_recommend?: boolean;
+  is_verified_student?: boolean;
+}) {
+  const { data, error } = await supabase
+    .from('reviews')
+    .insert([{
+      ...review,
+      is_approved: false, // All reviews start as unapproved
+      helpful_count: 0,
+    }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error submitting review:', error);
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+// =====================================================
 // AI MATCHING (via API endpoint)
 // =====================================================
 

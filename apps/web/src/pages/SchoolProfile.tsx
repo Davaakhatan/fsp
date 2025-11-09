@@ -9,12 +9,14 @@ import { useSchool, useSchoolPrograms, useSchoolAircraft, useSchoolReviews } fro
 import { TrustBadge } from '../components/TrustBadge';
 import { useToast } from '../components/ToastProvider';
 import InquiryForm from '../components/InquiryForm';
+import ReviewForm from '../components/ReviewForm';
 
 export const SchoolProfile: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<'overview' | 'programs' | 'fleet' | 'reviews'>('overview');
   const [showInquiryForm, setShowInquiryForm] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   // Fetch data
   const { data: school, isLoading: schoolLoading } = useSchool(slug!);
@@ -24,6 +26,10 @@ export const SchoolProfile: React.FC = () => {
 
   const handleInquirySuccess = () => {
     showToast('success', 'Inquiry sent! The school will contact you soon.');
+  };
+
+  const handleReviewSuccess = () => {
+    showToast('success', 'Review submitted! It will appear after moderation.');
   };
 
   if (schoolLoading) {
@@ -121,13 +127,22 @@ export const SchoolProfile: React.FC = () => {
             </div>
 
             {/* CTA */}
-            <button
-              onClick={() => setShowInquiryForm(true)}
-              className="px-8 py-4 bg-white text-blue-600 font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 flex items-center space-x-2"
-            >
-              <Send className="h-5 w-5" />
-              <span>Request Information</span>
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => setShowInquiryForm(true)}
+                className="px-8 py-4 bg-white text-blue-600 font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
+              >
+                <Send className="h-5 w-5" />
+                <span>Request Information</span>
+              </button>
+              <button
+                onClick={() => setShowReviewForm(true)}
+                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
+              >
+                <Star className="h-5 w-5" />
+                <span>Write a Review</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -470,6 +485,16 @@ export const SchoolProfile: React.FC = () => {
           schoolName={school.name}
           onClose={() => setShowInquiryForm(false)}
           onSuccess={handleInquirySuccess}
+        />
+      )}
+
+      {/* Review Modal */}
+      {showReviewForm && school && (
+        <ReviewForm
+          schoolId={school.id}
+          schoolName={school.name}
+          onClose={() => setShowReviewForm(false)}
+          onSuccess={handleReviewSuccess}
         />
       )}
     </div>

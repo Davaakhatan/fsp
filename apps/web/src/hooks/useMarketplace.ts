@@ -95,6 +95,24 @@ export function useSubmitInquiry() {
 }
 
 // =====================================================
+// REVIEWS
+// =====================================================
+
+export function useSubmitReview() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: api.submitReview,
+    onSuccess: (_, variables) => {
+      // Invalidate reviews for this school
+      queryClient.invalidateQueries({ queryKey: ['schools', variables.school_id, 'reviews'] });
+      // Invalidate school data (review count/rating may have changed)
+      queryClient.invalidateQueries({ queryKey: ['schools'] });
+    },
+  });
+}
+
+// =====================================================
 // AI MATCHING
 // =====================================================
 
