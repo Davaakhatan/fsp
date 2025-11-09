@@ -10,27 +10,32 @@ const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5175';
 export async function searchSchools(filters: SearchFilters = {}): Promise<SchoolSummary[]> {
   console.log('🔍 Search filters:', filters);
   
-  let query = supabase
-    .from('school_summary')
-    .select('*');
+  let query;
+  let isUsingRPC = false;
 
-  // Location-based filtering
+  // Location-based filtering using PostGIS
   if (filters.latitude && filters.longitude && filters.radius_miles) {
-    // PostGIS distance query
+    // PostGIS distance query - use RPC directly
     const radiusMeters = filters.radius_miles * 1609.34;
     console.log('📍 Using PostGIS radius search');
-    query = query.rpc('schools_within_radius', {
+    query = supabase.rpc('schools_within_radius', {
       search_lat: filters.latitude,
       search_lon: filters.longitude,
       radius_meters: radiusMeters,
     });
+    isUsingRPC = true;
+  } else {
+    // Regular query
+    query = supabase
+      .from('school_summary')
+      .select('*');
   }
 
   // City/State search (text-based location search)
   // Note: For now, we rely on geocoding to convert text to lat/lon
   // Text-based filtering without geocoding is disabled due to PostgREST limitations
   // TODO: Create a custom RPC function for text search
-  if (filters.location && !filters.latitude) {
+  if (filters.location && !filters.latitude && !isUsingRPC) {
     console.log('🔤 Text search without geocoding - showing all schools');
     // Don't filter, just show all schools
     // The geocoding will kick in after the API call completes
