@@ -20,22 +20,28 @@ export const SearchResults: React.FC = () => {
   });
 
   // Geocode location if needed
-  const { data: geocodeData } = useGeocoding(filters.location || '');
+  const { data: geocodeData, isLoading: isGeocoding } = useGeocoding(filters.location || '');
   
-  // Update filters with geocoded coordinates
-  useEffect(() => {
-    if (geocodeData) {
-      setFilters(prev => ({
-        ...prev,
+  // Create search filters with coordinates
+  const searchFilters = React.useMemo(() => {
+    if (geocodeData && filters.location) {
+      return {
+        ...filters,
         latitude: geocodeData.lat,
         longitude: geocodeData.lon,
-        radius_miles: prev.radius_miles || 100, // Default 100 miles
-      }));
+        radius_miles: filters.radius_miles || 100, // Default 100 miles
+      };
     }
-  }, [geocodeData]);
+    return filters;
+  }, [filters, geocodeData]);
 
-  // Fetch schools
-  const { data: schools, isLoading, error } = useSchoolSearch(filters);
+  // Fetch schools (will wait for geocoding if location is provided)
+  const shouldSearch = !filters.location || geocodeData || !isGeocoding;
+  const { data: schools, isLoading: isSearching, error } = useSchoolSearch(
+    shouldSearch ? searchFilters : undefined
+  );
+  
+  const isLoading = isGeocoding || isSearching;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
