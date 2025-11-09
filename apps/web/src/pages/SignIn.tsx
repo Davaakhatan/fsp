@@ -13,20 +13,30 @@ export const SignIn: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const from = (location.state as any)?.from?.pathname || '/portal/dashboard';
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const { error } = await signIn(email, password);
+    const { error: signInError, data } = await signIn(email, password);
 
-    if (error) {
-      setError(error.message);
+    if (signInError) {
+      setError(signInError.message);
       setLoading(false);
     } else {
-      navigate(from, { replace: true });
+      // Redirect based on role
+      const userRole = data?.user?.user_metadata?.role || 'user';
+      const from = (location.state as any)?.from?.pathname;
+      
+      if (from) {
+        navigate(from, { replace: true });
+      } else if (userRole === 'admin' || userRole === 'super_admin') {
+        navigate('/admin/portal/dashboard', { replace: true });
+      } else if (userRole === 'school_admin') {
+        navigate('/portal/inquiries', { replace: true });
+      } else {
+        navigate('/', { replace: true }); // Regular users go to homepage
+      }
     }
   };
 
@@ -36,13 +46,22 @@ export const SignIn: React.FC = () => {
     setError('');
     setLoading(true);
 
-    const { error } = await signIn('demo@flightschool.com', 'demo123456');
+    const { error: signInError, data } = await signIn('demo@flightschool.com', 'demo123456');
 
-    if (error) {
+    if (signInError) {
       setError('Demo account not set up yet. Please create an account or use your own credentials.');
       setLoading(false);
     } else {
-      navigate(from, { replace: true });
+      // Redirect based on role
+      const userRole = data?.user?.user_metadata?.role || 'user';
+      
+      if (userRole === 'admin' || userRole === 'super_admin') {
+        navigate('/admin/portal/dashboard', { replace: true });
+      } else if (userRole === 'school_admin') {
+        navigate('/portal/inquiries', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     }
   };
 
