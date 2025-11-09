@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Sparkles, Calculator, Menu, X, LogIn, LogOut, User, ChevronDown, LayoutDashboard, Calendar, CloudRain, Mail } from 'lucide-react';
+import { Search, Sparkles, Calculator, Menu, X, LogIn, LogOut, User, ChevronDown, LayoutDashboard, Calendar, CloudRain, Mail, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
