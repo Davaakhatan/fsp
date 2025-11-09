@@ -8,11 +8,12 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   userRole: UserRole | null;
+  schoolId: string | null;
   loading: boolean;
   isAdmin: boolean;
   isSchoolAdmin: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, metadata?: any) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any; data: any }>;
+  signUp: (email: string, password: string, metadata?: any) => Promise<{ error: any; data: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -22,7 +23,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Fetch school_id for school admins
+  const fetchSchoolId = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('school_admins')
+      .select('school_id')
+      .eq('user_id', userId)
+      .single();
+    
+    if (!error && data) {
+      setSchoolId(data.school_id);
+    } else {
+      setSchoolId(null);
+    }
+  };
 
   useEffect(() => {
     // Get initial session
@@ -30,6 +47,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       setUserRole(extractRole(session?.user));
+      if (session?.user) {
+        fetchSchoolId(session.user.id);
+      }
       setLoading(false);
     });
 
@@ -40,6 +60,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       setUserRole(extractRole(session?.user));
+      if (session?.user) {
+        fetchSchoolId(session.user.id);
+      } else {
+        setSchoolId(null);
+      }
       setLoading(false);
     });
 
@@ -56,25 +81,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isSchoolAdmin = isAdmin || userRole === 'school_admin';
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error, data } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    return { error };
+    return { error, data };
   };
 
   const signUp = async (email: string, password: string, metadata?: any) => {
-    const { error } = await supabase.auth.signUp({
+    const { error, data } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           ...metadata,
-          role: 'school_admin', // Default role for new signups
+          role: metadata?.role || 'school_admin', // Default role for new signups
         },
       },
     });
-    return { error };
+    return { error, data };
   };
 
   const signOut = async () => {
@@ -85,6 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     userRole,
+    schoolId,
     loading,
     isAdmin,
     isSchoolAdmin,
