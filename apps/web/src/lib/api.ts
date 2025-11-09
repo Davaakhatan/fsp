@@ -27,10 +27,14 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
   }
 
   // City/State search (text-based location search)
+  // Note: For now, we rely on geocoding to convert text to lat/lon
+  // Text-based filtering without geocoding is disabled due to PostgREST limitations
+  // TODO: Create a custom RPC function for text search
   if (filters.location && !filters.latitude) {
-    console.log('🔤 Using text search for:', filters.location);
-    // Split the OR conditions for better compatibility
-    query = query.or(`city.ilike.*${filters.location}*,state.ilike.*${filters.location}*,name.ilike.*${filters.location}*`);
+    console.log('🔤 Text search without geocoding - showing all schools');
+    // Don't filter, just show all schools
+    // The geocoding will kick in after the API call completes
+  }
   }
 
   // Program type filtering
