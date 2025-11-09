@@ -8,8 +8,7 @@
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
--- Note: PostGIS not available in Supabase free tier
--- We'll use simple lat/lon columns instead
+CREATE EXTENSION IF NOT EXISTS "postgis"; -- For geographic queries (requires Supabase Pro)
 
 -- =====================================================
 -- CORE TABLES
@@ -461,8 +460,8 @@ CREATE INDEX idx_schools_trust_tier ON schools(trust_tier);
 CREATE INDEX idx_schools_subscription_tier ON schools(subscription_tier);
 CREATE INDEX idx_schools_is_claimed ON schools(is_claimed);
 CREATE INDEX idx_schools_is_active ON schools(is_active);
--- Removed PostGIS index, using simple lat/lon instead
-CREATE INDEX idx_schools_lat_lon ON schools(latitude, longitude);
+-- PostGIS spatial index for fast geographic queries
+CREATE INDEX idx_schools_location ON schools USING GIST(ST_MakePoint(longitude, latitude));
 
 -- Programs
 CREATE INDEX idx_programs_school_id ON programs(school_id);
@@ -487,8 +486,8 @@ CREATE INDEX idx_inquiries_created_at ON inquiries(created_at DESC);
 
 -- Student Profiles
 CREATE INDEX idx_student_profiles_email ON student_profiles(email);
--- Removed PostGIS index, using simple lat/lon instead
-CREATE INDEX idx_student_profiles_lat_lon ON student_profiles(preferred_location_lat, preferred_location_lon);
+-- PostGIS spatial index for matching students to nearby schools
+CREATE INDEX idx_student_profiles_location ON student_profiles USING GIST(ST_MakePoint(preferred_location_lon, preferred_location_lat));
 
 -- Page Views
 CREATE INDEX idx_page_views_school_id ON page_views(school_id);
