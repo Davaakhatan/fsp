@@ -98,8 +98,9 @@ export default function Bookings() {
             aircraft_id: formData.aircraftId,
             scheduled_time: formData.scheduledTime,
             departure_location_id: formData.departureLocationId,
-            arrival_location_id: formData.arrivalLocationId || formData.departureLocationId,
-            route: formData.route || null,
+            destination_location_id: formData.arrivalLocationId || formData.departureLocationId,
+            duration_minutes: 60, // Default 1 hour lesson
+            notes: formData.route || null,
             status: 'SCHEDULED',
           },
         ])
