@@ -8,15 +8,31 @@ import {
   MapPin,
   Clock,
   User,
-  Plane
+  Plane,
+  Calendar,
+  CheckCircle,
+  Loader2
 } from 'lucide-react';
 import { useWeatherAlerts } from '../hooks/useApi';
 import { formatDateTime } from '@fsp/shared';
+import { useToast } from '../components/ToastProvider';
+
+interface RescheduleOption {
+  proposedTime: string;
+  weatherForecast: any;
+  aiScore: number;
+  aiReasoning: string;
+}
 
 export default function WeatherAlerts() {
   const { data: alerts, isLoading } = useWeatherAlerts();
+  const { showToast } = useToast();
   const [selectedSeverity, setSelectedSeverity] = useState<string>('ALL');
   const [selectedAlert, setSelectedAlert] = useState<any>(null);
+  const [showRescheduleOptions, setShowRescheduleOptions] = useState(false);
+  const [rescheduleOptions, setRescheduleOptions] = useState<RescheduleOption[]>([]);
+  const [generatingOptions, setGeneratingOptions] = useState(false);
+  const [selectingOption, setSelectingOption] = useState(false);
 
   // Filter alerts by severity
   const filteredAlerts = alerts?.filter(alert => 
@@ -46,6 +62,55 @@ export default function WeatherAlerts() {
     return severity === 'CRITICAL' ? 'bg-red-500' : 
            severity === 'HIGH' ? 'bg-orange-500' : 
            severity === 'MEDIUM' ? 'bg-yellow-500' : 'bg-blue-500';
+  };
+
+  const handleGenerateOptions = async () => {
+    if (!selectedAlert?.booking?.id) {
+      showToast('error', 'No booking found for this alert');
+      return;
+    }
+
+    setGeneratingOptions(true);
+    try {
+      const response = await fetch('/api/reschedule/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          bookingId: selectedAlert.booking.id,
+          weatherAlertId: selectedAlert.id
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate options');
+      }
+
+      const data = await response.json();
+      setRescheduleOptions(data.options || []);
+      setShowRescheduleOptions(true);
+      setSelectedAlert(null);
+      showToast('success', `Generated ${data.options?.length || 0} reschedule options!`);
+    } catch (error: any) {
+      console.error('Error generating options:', error);
+      showToast('error', error.message || 'Failed to generate reschedule options');
+    } finally {
+      setGeneratingOptions(false);
+    }
+  };
+
+  const handleSelectOption = async (option: RescheduleOption) => {
+    setSelectingOption(true);
+    try {
+      // In a real app, this would update the booking and send notifications
+      showToast('success', 'Reschedule option selected! (Demo mode - no actual booking update)');
+      setShowRescheduleOptions(false);
+      setRescheduleOptions([]);
+    } catch (error: any) {
+      console.error('Error selecting option:', error);
+      showToast('error', error.message || 'Failed to select option');
+    } finally {
+      setSelectingOption(false);
+    }
   };
 
   return (
@@ -223,7 +288,7 @@ export default function WeatherAlerts() {
       )}
 
       {/* Alert Detail Modal */}
-      {selectedAlert && (
+      {selectedAlert && !showRescheduleOptions && (
         <div 
           className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
           onClick={() => setSelectedAlert(null)}
@@ -298,16 +363,120 @@ export default function WeatherAlerts() {
 
               {/* Actions */}
               <div className="flex gap-3 pt-4 border-t border-gray-200">
-                <button className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg">
-                  Generate Reschedule Options
+                <button 
+                  onClick={handleGenerateOptions}
+                  disabled={generatingOptions}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {generatingOptions ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Generating Options...
+                    </>
+                  ) : (
+                    <>
+                      <Calendar className="h-5 w-5" />
+                      Generate Reschedule Options
+                    </>
+                  )}
                 </button>
                 <button 
                   onClick={() => setSelectedAlert(null)}
-                  className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+                  disabled={generatingOptions}
+                  className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50"
                 >
                   Close
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reschedule Options Modal */}
+      {showRescheduleOptions && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
+          onClick={() => setShowRescheduleOptions(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl max-w-4xl w-full shadow-2xl animate-slideUp max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-white flex items-center justify-between p-6 border-b border-gray-200 z-10">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">AI-Generated Reschedule Options</h2>
+                <p className="text-sm text-gray-600">Select the best option for your flight</p>
+              </div>
+              <button
+                onClick={() => setShowRescheduleOptions(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors hover:rotate-90 transform"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              {rescheduleOptions.length === 0 ? (
+                <div className="py-12 text-center">
+                  <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-600">No options available</p>
+                </div>
+              ) : (
+                rescheduleOptions.map((option, index) => (
+                  <div
+                    key={index}
+                    className="bg-white border border-gray-200 rounded-xl p-6 hover:border-blue-500 hover:shadow-lg transition-all group"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <Calendar className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900">Option {index + 1}</h3>
+                          <p className="text-sm text-gray-600">
+                            {formatDateTime(option.proposedTime)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-lg">
+                        <span className="text-sm font-medium text-emerald-700">
+                          Score: {Math.round(option.aiScore * 100)}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-gray-700 mb-2">AI Reasoning:</p>
+                      <p className="text-sm text-gray-600">{option.aiReasoning}</p>
+                    </div>
+
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Weather Forecast:</p>
+                      <p className="text-sm text-gray-600">{option.weatherForecast}</p>
+                    </div>
+
+                    <button
+                      onClick={() => handleSelectOption(option)}
+                      disabled={selectingOption}
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {selectingOption ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Selecting...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="h-4 w-4" />
+                          Select This Option
+                        </>
+                      )}
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
