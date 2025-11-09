@@ -109,7 +109,11 @@ export default function Inquiries() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Student Inquiries</h1>
-          <p className="text-gray-600">Manage inquiries from prospective students</p>
+          <p className="text-gray-600">
+            {isAdmin 
+              ? 'Manage inquiries from prospective students for all schools' 
+              : 'Manage inquiries from prospective students'}
+          </p>
         </div>
 
         {/* Stats */}
@@ -151,6 +155,12 @@ export default function Inquiries() {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">{inquiry.student_name}</h3>
+                      {/* Show school name for platform admins */}
+                      {isAdmin && inquiry.school && (
+                        <p className="text-sm font-medium text-blue-600 mt-1">
+                          {inquiry.school.name}
+                        </p>
+                      )}
                       <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                         <span className="flex items-center gap-1">
                           <Mail className="h-4 w-4" />
