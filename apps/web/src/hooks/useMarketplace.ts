@@ -6,6 +6,14 @@ import type { SearchFilters } from '@fsp/shared';
 // SCHOOL SEARCH & DISCOVERY
 // =====================================================
 
+export function useSchools(filters: SearchFilters = {}) {
+  return useQuery({
+    queryKey: ['schools', 'all', filters],
+    queryFn: () => api.searchSchools(filters),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
 export function useSchoolSearch(filters: SearchFilters = {}) {
   return useQuery({
     queryKey: ['schools', 'search', filters],
