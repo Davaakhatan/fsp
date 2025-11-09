@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard';
 import Bookings from './pages/Bookings';
 import WeatherAlerts from './pages/WeatherAlerts';
 import Inquiries from './pages/Inquiries';
+import Reviews from './pages/Reviews';
 import { Layout } from './components/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
@@ -60,6 +61,7 @@ export default function App() {
                 <Route path="/portal/bookings" element={<Layout><ProtectedRoute><Bookings /></ProtectedRoute></Layout>} />
                 <Route path="/portal/weather" element={<Layout><ProtectedRoute><WeatherAlerts /></ProtectedRoute></Layout>} />
                 <Route path="/portal/inquiries" element={<Layout><ProtectedRoute><Inquiries /></ProtectedRoute></Layout>} />
+                <Route path="/portal/reviews" element={<Layout><ProtectedRoute><Reviews /></ProtectedRoute></Layout>} />
               </Routes>
             </Router>
           </AuthProvider>
