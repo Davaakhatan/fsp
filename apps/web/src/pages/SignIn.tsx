@@ -30,6 +30,22 @@ export const SignIn: React.FC = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setEmail('demo@flightschool.com');
+    setPassword('demo123456');
+    setError('');
+    setLoading(true);
+
+    const { error } = await signIn('demo@flightschool.com', 'demo123456');
+
+    if (error) {
+      setError('Demo account not set up yet. Please create an account or use your own credentials.');
+      setLoading(false);
+    } else {
+      navigate(from, { replace: true });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
@@ -127,6 +143,25 @@ export const SignIn: React.FC = () => {
                   <span>Sign In</span>
                 </>
               )}
+            </button>
+
+            {/* Demo Login Button */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={loading}
+              className="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-blue-600 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span>Try Demo Account</span>
             </button>
           </form>
 
