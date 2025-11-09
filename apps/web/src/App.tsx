@@ -9,11 +9,13 @@ import { AIMatching } from './pages/AIMatching';
 import { FinancingHub } from './pages/FinancingHub';
 import { SignIn } from './pages/SignIn';
 import { SignUp } from './pages/SignUp';
+import { AdminDashboard } from './pages/AdminDashboard';
 import Dashboard from './pages/Dashboard';
 import Bookings from './pages/Bookings';
 import WeatherAlerts from './pages/WeatherAlerts';
 import { Layout } from './components/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminRoute } from './components/AdminRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/ToastProvider';
 import { AuthProvider } from './contexts/AuthContext';
@@ -49,7 +51,10 @@ export default function App() {
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
                 
-                {/* Protected Routes - School Portal */}
+                {/* Admin Routes (Platform Admins Only) */}
+                <Route path="/admin/dashboard" element={<Layout><AdminRoute><AdminDashboard /></AdminRoute></Layout>} />
+                
+                {/* Protected Routes - School Portal (School Admins) */}
                 <Route path="/portal/dashboard" element={<Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout>} />
                 <Route path="/portal/bookings" element={<Layout><ProtectedRoute><Bookings /></ProtectedRoute></Layout>} />
                 <Route path="/portal/weather" element={<Layout><ProtectedRoute><WeatherAlerts /></ProtectedRoute></Layout>} />

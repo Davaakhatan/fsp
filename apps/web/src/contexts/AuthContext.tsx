@@ -1,11 +1,16 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
+
+type UserRole = 'super_admin' | 'admin' | 'school_admin' | 'user';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
+  userRole: UserRole | null;
   loading: boolean;
+  isAdmin: boolean;
+  isSchoolAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, metadata?: any) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -16,6 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,6 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setUserRole(extractRole(session?.user));
       setLoading(false);
     });
 
@@ -32,11 +39,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setUserRole(extractRole(session?.user));
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const extractRole = (user: User | null | undefined): UserRole | null => {
+    if (!user) return null;
+    const role = user.user_metadata?.role;
+    return role || 'user';
+  };
+
+  const isAdmin = userRole === 'super_admin' || userRole === 'admin';
+  const isSchoolAdmin = isAdmin || userRole === 'school_admin';
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -51,7 +68,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email,
       password,
       options: {
-        data: metadata,
+        data: {
+          ...metadata,
+          role: 'school_admin', // Default role for new signups
+        },
       },
     });
     return { error };
@@ -64,7 +84,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value = {
     user,
     session,
+    userRole,
     loading,
+    isAdmin,
+    isSchoolAdmin,
     signIn,
     signUp,
     signOut,
@@ -80,4 +103,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
