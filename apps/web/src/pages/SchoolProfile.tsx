@@ -62,7 +62,9 @@ export const SchoolProfile: React.FC = () => {
     );
   }
 
-  const avgRating = reviews?.reduce((sum, r) => sum + r.rating, 0) / (reviews?.length || 1);
+  const avgRating = reviews && reviews.length > 0 
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
+    : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">

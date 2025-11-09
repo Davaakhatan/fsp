@@ -6,10 +6,9 @@ import { useAuth } from '../contexts/AuthContext';
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, userRole, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [portalDropdownOpen, setPortalDropdownOpen] = React.useState(false);
-  const [adminDropdownOpen, setAdminDropdownOpen] = React.useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
