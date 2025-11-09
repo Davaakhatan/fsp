@@ -23,9 +23,10 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
     });
   }
 
-  // City/State search
+  // City/State search (text-based location search)
   if (filters.location && !filters.latitude) {
-    query = query.or(`city.ilike.%${filters.location}%,state.ilike.%${filters.location}%`);
+    const searchTerm = `%${filters.location}%`;
+    query = query.or(`city.ilike.${searchTerm},state.ilike.${searchTerm}`);
   }
 
   // Program type filtering
