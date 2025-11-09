@@ -151,18 +151,18 @@ INSERT INTO reviews (id, school_id, student_name, program_completed, rating, tit
 -- =====================================================
 
 INSERT INTO financing_partners (id, name, logo_url, website, description, min_loan_amount, max_loan_amount, min_apr, max_apr, loan_term_months, min_credit_score, requires_cosigner) VALUES
-('f1111111-1111-1111-1111-111111111111', 'Aviation Finance Corp', 'https://example.com/afc-logo.png', 'https://aviationfinance.com', 'Specialized flight training loans with competitive rates for qualified borrowers.', 5000, 100000, 6.99, 14.99, 84, 650, FALSE),
-('f2222222-2222-2222-2222-222222222222', 'Pilot Path Lending', 'https://example.com/ppl-logo.png', 'https://pilotpathlending.com', 'Flexible loan options for aspiring pilots, including cosigner programs for students.', 3000, 75000, 7.99, 16.99, 60, 580, TRUE),
-('f3333333-3333-3333-3333-333333333333', 'Stratus Financial', 'https://example.com/stratus-logo.png', 'https://stratusfinancial.com', 'Industry leader in flight training financing with fast approvals.', 2500, 150000, 6.49, 13.99, 120, 680, FALSE);
+('e1111111-1111-1111-1111-111111111111', 'Aviation Finance Corp', 'https://example.com/afc-logo.png', 'https://aviationfinance.com', 'Specialized flight training loans with competitive rates for qualified borrowers.', 5000, 100000, 6.99, 14.99, 84, 650, FALSE),
+('e2222222-2222-2222-2222-222222222222', 'Pilot Path Lending', 'https://example.com/ppl-logo.png', 'https://pilotpathlending.com', 'Flexible loan options for aspiring pilots, including cosigner programs for students.', 3000, 75000, 7.99, 16.99, 60, 580, TRUE),
+('e3333333-3333-3333-3333-333333333333', 'Stratus Financial', 'https://example.com/stratus-logo.png', 'https://stratusfinancial.com', 'Industry leader in flight training financing with fast approvals.', 2500, 150000, 6.49, 13.99, 120, 680, FALSE);
 
 -- =====================================================
 -- 7. SCHOLARSHIPS
 -- =====================================================
 
 INSERT INTO scholarships (id, name, provider, description, amount, deadline, application_url, eligibility_criteria, program_types) VALUES
-('sc111111-1111-1111-1111-111111111111', 'AOPA Flight Training Scholarship', 'Aircraft Owners and Pilots Association', 'Scholarships for high school students pursuing their private pilot license.', 10000, '2025-03-31', 'https://aopa.org/scholarships', 'High school students aged 15-18, good academic standing', ARRAY['ppl']),
-('sc222222-2222-2222-2222-222222222222', 'Women in Aviation International Scholarship', 'Women in Aviation International', 'Scholarships for women pursuing aviation careers at all levels.', 5000, '2025-06-30', 'https://wai.org/scholarships', 'Female students, all ratings', ARRAY['ppl', 'ir', 'cpl', 'cfi']),
-('sc333333-3333-3333-3333-333333333333', 'EAA Young Eagles Scholarship', 'Experimental Aircraft Association', 'Flight training scholarships for Young Eagles participants.', 8000, '2025-05-15', 'https://eaa.org/scholarships', 'Young Eagles participants aged 16-19', ARRAY['ppl']);
+('d1111111-1111-1111-1111-111111111111', 'AOPA Flight Training Scholarship', 'Aircraft Owners and Pilots Association', 'Scholarships for high school students pursuing their private pilot license.', 10000, '2025-03-31', 'https://aopa.org/scholarships', 'High school students aged 15-18, good academic standing', ARRAY['ppl']),
+('d2222222-2222-2222-2222-222222222222', 'Women in Aviation International Scholarship', 'Women in Aviation International', 'Scholarships for women pursuing aviation careers at all levels.', 5000, '2025-06-30', 'https://wai.org/scholarships', 'Female students, all ratings', ARRAY['ppl', 'ir', 'cpl', 'cfi']),
+('d3333333-3333-3333-3333-333333333333', 'EAA Young Eagles Scholarship', 'Experimental Aircraft Association', 'Flight training scholarships for Young Eagles participants.', 8000, '2025-05-15', 'https://eaa.org/scholarships', 'Young Eagles participants aged 16-19', ARRAY['ppl']);
 
 -- =====================================================
 -- END OF SEED DATA
