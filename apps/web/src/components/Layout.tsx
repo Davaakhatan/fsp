@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Sparkles, Calculator, Menu, X, LogIn, LogOut, User } from 'lucide-react';
+import { Search, Sparkles, Calculator, Menu, X, LogIn, LogOut, User, ChevronDown, LayoutDashboard, Calendar, CloudRain } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -8,6 +8,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const navigate = useNavigate();
   const { user, userRole, isAdmin, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [portalDropdownOpen, setPortalDropdownOpen] = React.useState(false);
+  const [adminDropdownOpen, setAdminDropdownOpen] = React.useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -15,6 +17,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     { path: '/search', label: 'Browse Schools', icon: Search },
     { path: '/find-match', label: 'Find My Match', icon: Sparkles },
     { path: '/financing', label: 'Financing', icon: Calculator },
+  ];
+
+  const portalLinks = [
+    { path: '/portal/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/portal/bookings', label: 'Bookings', icon: Calendar },
+    { path: '/portal/weather', label: 'Weather Alerts', icon: CloudRain },
   ];
 
   const handleSignOut = async () => {
@@ -77,17 +85,41 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       <span>Admin</span>
                     </Link>
                   )}
-                  <Link
-                    to="/portal/dashboard"
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all ${
-                      location.pathname.startsWith('/portal')
-                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <User className="h-4 w-4" />
-                    <span>Portal</span>
-                  </Link>
+                  
+                  {/* Portal Dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setPortalDropdownOpen(!portalDropdownOpen)}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all ${
+                        location.pathname.startsWith('/portal')
+                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      <User className="h-4 w-4" />
+                      <span>Portal</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                    
+                    {portalDropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
+                        {portalLinks.map(({ path, label, icon: Icon }) => (
+                          <Link
+                            key={path}
+                            to={path}
+                            onClick={() => setPortalDropdownOpen(false)}
+                            className={`flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-all ${
+                              location.pathname === path ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                            }`}
+                          >
+                            <Icon className="h-4 w-4" />
+                            <span>{label}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   <button
                     onClick={handleSignOut}
                     className="flex items-center space-x-2 px-4 py-2 rounded-xl font-medium text-gray-700 hover:bg-gray-100 transition-all"
