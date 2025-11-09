@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Sparkles, Calculator, Menu, X, LogIn, LogOut, User, ChevronDown, Mail, Star } from 'lucide-react';
+import { Search, Sparkles, Calculator, Menu, X, LogIn, LogOut, User, ChevronDown, Mail, Star, LayoutDashboard, Calendar, CloudRain } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -22,6 +22,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const portalLinks = [
     { path: '/portal/inquiries', label: 'Inquiries', icon: Mail },
     { path: '/portal/reviews', label: 'Reviews', icon: Star },
+  ];
+
+  const adminPortalLinks = [
+    { path: '/admin/portal/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/admin/portal/bookings', label: 'Bookings', icon: Calendar },
+    { path: '/admin/portal/weather', label: 'Weather Alerts', icon: CloudRain },
   ];
 
   const handleSignOut = async () => {
@@ -115,6 +121,27 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                             <span>{label}</span>
                           </Link>
                         ))}
+                        
+                        {/* Admin-only portal links */}
+                        {isAdmin && (
+                          <>
+                            <div className="border-t border-gray-200 my-2"></div>
+                            <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Admin Tools</div>
+                            {adminPortalLinks.map(({ path, label, icon: Icon }) => (
+                              <Link
+                                key={path}
+                                to={path}
+                                onClick={() => setPortalDropdownOpen(false)}
+                                className={`flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-all ${
+                                  location.pathname === path ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                                }`}
+                              >
+                                <Icon className="h-4 w-4" />
+                                <span>{label}</span>
+                              </Link>
+                            ))}
+                          </>
+                        )}
                       </div>
                     )}
                   </div>

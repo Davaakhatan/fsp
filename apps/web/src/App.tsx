@@ -10,6 +10,9 @@ import { FinancingHub } from './pages/FinancingHub';
 import { SignIn } from './pages/SignIn';
 import { SignUp } from './pages/SignUp';
 import { AdminDashboard } from './pages/AdminDashboard';
+import Dashboard from './pages/Dashboard';
+import Bookings from './pages/Bookings';
+import WeatherAlerts from './pages/WeatherAlerts';
 import Inquiries from './pages/Inquiries';
 import Reviews from './pages/Reviews';
 import { Layout } from './components/Layout';
@@ -52,6 +55,9 @@ export default function App() {
                 
                 {/* Admin Routes (Platform Admins Only) */}
                 <Route path="/admin/dashboard" element={<Layout><AdminRoute><AdminDashboard /></AdminRoute></Layout>} />
+                <Route path="/admin/portal/dashboard" element={<Layout><AdminRoute><Dashboard /></AdminRoute></Layout>} />
+                <Route path="/admin/portal/bookings" element={<Layout><AdminRoute><Bookings /></AdminRoute></Layout>} />
+                <Route path="/admin/portal/weather" element={<Layout><AdminRoute><WeatherAlerts /></AdminRoute></Layout>} />
                 
                 {/* Protected Routes - School Portal (School Admins) */}
                 <Route path="/portal/inquiries" element={<Layout><ProtectedRoute><Inquiries /></ProtectedRoute></Layout>} />
