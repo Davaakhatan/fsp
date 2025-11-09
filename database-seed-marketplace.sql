@@ -125,26 +125,26 @@ INSERT INTO simulators (id, school_id, name, type, manufacturer, model, simulate
 
 -- San Diego FTI Reviews
 INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, rating_value, rating_support, is_verified, is_approved) VALUES
-('r1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Michael Johnson', 'ppl', 5.0, 'Best decision I ever made!', 'I completed my PPL here in just 4 months! The instructors are top-notch, the aircraft are new and well-maintained, and the structured curriculum kept me on track. Worth every penny.', 5.0, 5.0, 5.0, 4.5, 5.0, TRUE, TRUE),
-('r1111112-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Sarah Chen', 'ir', 4.8, 'Excellent instrument training', 'The G1000 fleet made instrument training so much easier. My instructor was patient and thorough. Passed my checkride on the first try!', 5.0, 5.0, 4.5, 4.5, 5.0, TRUE, TRUE),
-('r1111113-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'David Martinez', 'cpl', 4.7, 'Great professional training', 'If you want to become a career pilot, this is the place. They prepare you for the real world of aviation.', 4.5, 5.0, 4.5, 4.5, 5.0, TRUE, TRUE);
+('b1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Michael Johnson', 'ppl', 5.0, 'Best decision I ever made!', 'I completed my PPL here in just 4 months! The instructors are top-notch, the aircraft are new and well-maintained, and the structured curriculum kept me on track. Worth every penny.', 5.0, 5.0, 5.0, 4.5, 5.0, TRUE, TRUE),
+('b1111112-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Sarah Chen', 'ir', 4.8, 'Excellent instrument training', 'The G1000 fleet made instrument training so much easier. My instructor was patient and thorough. Passed my checkride on the first try!', 5.0, 5.0, 4.5, 4.5, 5.0, TRUE, TRUE),
+('b1111113-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'David Martinez', 'cpl', 4.7, 'Great professional training', 'If you want to become a career pilot, this is the place. They prepare you for the real world of aviation.', 4.5, 5.0, 4.5, 4.5, 5.0, TRUE, TRUE);
 
 -- Phoenix Aviation Reviews
 INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, rating_value, rating_support, is_verified, is_approved) VALUES
-('r2222221-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222', 'Jennifer Williams', 'ppl', 4.6, 'Solid training, flexible schedule', 'As a part-time student, I appreciated the flexible scheduling. Took me about 7 months but the instructors were always accommodating.', 4.5, 4.5, 4.0, 5.0, 4.5, TRUE, TRUE),
-('r2222222-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222', 'Robert Taylor', 'ir', 4.5, 'Good instrument program', 'Great instructors with lots of real-world experience. Aircraft are older but well-maintained.', 5.0, 4.0, 4.0, 4.5, 4.5, TRUE, TRUE);
+('b2222221-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222', 'Jennifer Williams', 'ppl', 4.6, 'Solid training, flexible schedule', 'As a part-time student, I appreciated the flexible scheduling. Took me about 7 months but the instructors were always accommodating.', 4.5, 4.5, 4.0, 5.0, 4.5, TRUE, TRUE),
+('b2222222-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222', 'Robert Taylor', 'ir', 4.5, 'Good instrument program', 'Great instructors with lots of real-world experience. Aircraft are older but well-maintained.', 5.0, 4.0, 4.0, 4.5, 4.5, TRUE, TRUE);
 
 -- Austin Flight School Reviews
 INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, is_verified, is_approved) VALUES
-('r3333331-3333-3333-3333-333333333333', '33333333-3333-3333-3333-333333333333', 'Emily Anderson', 'ppl', 4.3, 'Budget-friendly option', 'If you''re looking to save money, this is a great choice. The training is solid, just be patient with scheduling.', 4.0, 4.0, 3.5, 5.0, 4.0, TRUE, TRUE);
+('b3333331-3333-3333-3333-333333333333', '33333333-3333-3333-3333-333333333333', 'Emily Anderson', 'ppl', 4.3, 'Budget-friendly option', 'If you''re looking to save money, this is a great choice. The training is solid, just be patient with scheduling.', 4.0, 4.0, 3.5, 5.0, 4.0, TRUE, TRUE);
 
 -- Miami Flight Center Reviews
 INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, rating_value, is_verified, is_approved) VALUES
-('r5555551-5555-5555-5555-555555555555', '55555555-5555-5555-5555-555555555555', 'Carlos Rodriguez', 'ppl', 4.7, 'Great weather, great training', 'You can fly almost every day here! Finished my PPL in 4 months with no weather delays. The multi-engine training is excellent too.', 4.5, 4.5, 4.5, 4.5, 5.0, TRUE, TRUE);
+('b5555551-5555-5555-5555-555555555555', '55555555-5555-5555-5555-555555555555', 'Carlos Rodriguez', 'ppl', 4.7, 'Great weather, great training', 'You can fly almost every day here! Finished my PPL in 4 months with no weather delays. The multi-engine training is excellent too.', 4.5, 4.5, 4.5, 4.5, 5.0, TRUE, TRUE);
 
 -- Chicago Flight Academy Reviews
 INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, rating_value, is_verified, is_approved) VALUES
-('r6666661-6666-6666-6666-666666666666', '66666666-6666-6666-6666-666666666666', 'Jessica Brown', 'ppl', 4.6, 'Professional and organized', 'Very well-organized school with professional staff. Weather can be challenging in winter but they make the most of good days.', 4.5, 4.5, 5.0, 4.5, 4.5, TRUE, TRUE);
+('b6666661-6666-6666-6666-666666666666', '66666666-6666-6666-6666-666666666666', 'Jessica Brown', 'ppl', 4.6, 'Professional and organized', 'Very well-organized school with professional staff. Weather can be challenging in winter but they make the most of good days.', 4.5, 4.5, 5.0, 4.5, 4.5, TRUE, TRUE);
 
 -- =====================================================
 -- 6. FINANCING PARTNERS
