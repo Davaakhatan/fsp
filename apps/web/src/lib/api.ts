@@ -20,12 +20,21 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
     console.log('📍 Using PostGIS radius search');
     console.log('   Coordinates:', filters.latitude, filters.longitude);
     console.log('   Radius:', filters.radius_miles, 'miles =', radiusMeters, 'meters');
-    query = supabase.rpc('schools_within_radius', {
-      search_lat: filters.latitude,
-      search_lon: filters.longitude,
-      radius_meters: radiusMeters,
-    });
-    isUsingRPC = true;
+    
+    // Test if RPC function exists
+    try {
+      query = supabase.rpc('schools_within_radius', {
+        search_lat: filters.latitude,
+        search_lon: filters.longitude,
+        radius_meters: radiusMeters,
+      });
+      isUsingRPC = true;
+      console.log('   RPC query created successfully');
+    } catch (e) {
+      console.error('   ❌ Error creating RPC query:', e);
+      // Fall back to regular query
+      query = supabase.from('school_summary').select('*');
+    }
   } else {
     // Regular query
     query = supabase
@@ -95,8 +104,14 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
   }
 
   console.log('✅ Search results:', data?.length, 'schools found');
-  if (isUsingRPC && data && data.length > 0) {
-    console.log('   First school:', data[0].name, 'at', data[0].distance_miles, 'miles');
+  if (isUsingRPC) {
+    console.log('   Used RPC function');
+    if (data && data.length > 0) {
+      console.log('   First result:', data[0].name);
+      console.log('   Has distance_miles?', 'distance_miles' in data[0], data[0].distance_miles);
+    }
+  } else {
+    console.log('   Used regular query (no RPC)');
   }
   return data || [];
 }
