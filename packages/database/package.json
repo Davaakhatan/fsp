@@ -5,6 +5,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
+    "build": "prisma generate",
     "type-check": "tsc --noEmit",
     "prisma": "prisma",
     "db:migrate": "prisma migrate dev",
