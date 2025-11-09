@@ -3,7 +3,9 @@
 ## Current Status
 🔨 **Development Phase - Local Testing**
 
-Core services are implemented and ready for local testing. Next step is to create API endpoints and complete the dashboard, then test locally before deploying to Vercel.
+Core services are implemented. Code pushed to GitHub (initial commit). Now continuing local development with git commits only (no pushing until ready). Next: create API endpoints and complete the dashboard integration.
+
+**Git Strategy**: Commit locally, push to GitHub only when features are complete and tested.
 
 ## What We Just Did
 
