@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
@@ -8,16 +8,130 @@ import {
   Users,
   MapPin,
   ChevronRight,
-  X
+  X,
+  Save,
+  Loader2
 } from 'lucide-react';
 import { useBookings } from '../hooks/useApi';
 import { formatTime } from '@fsp/shared';
+import { supabase } from '../lib/supabase';
+import { useToast } from '../components/ToastProvider';
 
 export default function Bookings() {
-  const { data: bookings, isLoading } = useBookings();
+  const { data: bookings, isLoading, refetch } = useBookings();
+  const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    studentId: '',
+    instructorId: '',
+    aircraftId: '',
+    scheduledTime: '',
+    departureLocationId: '',
+    arrivalLocationId: '',
+    route: '',
+  });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState('');
+  
+  // Lookup data
+  const [students, setStudents] = useState<any[]>([]);
+  const [instructors, setInstructors] = useState<any[]>([]);
+  const [aircraft, setAircraft] = useState<any[]>([]);
+  const [locations, setLocations] = useState<any[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  // Fetch lookup data when modal opens
+  useEffect(() => {
+    if (showCreateModal) {
+      fetchLookupData();
+    }
+  }, [showCreateModal]);
+
+  const fetchLookupData = async () => {
+    setDataLoading(true);
+    try {
+      const [studentsRes, instructorsRes, aircraftRes, locationsRes] = await Promise.all([
+        supabase.from('students').select('*').order('name'),
+        supabase.from('instructors').select('*').order('name'),
+        supabase.from('aircraft').select('*').order('tail_number'),
+        supabase.from('locations').select('*').order('name'),
+      ]);
+
+      if (studentsRes.data) setStudents(studentsRes.data);
+      if (instructorsRes.data) setInstructors(instructorsRes.data);
+      if (aircraftRes.data) setAircraft(aircraftRes.data);
+      if (locationsRes.data) setLocations(locationsRes.data);
+    } catch (error) {
+      console.error('Error fetching lookup data:', error);
+      setFormError('Failed to load form data. Please try again.');
+      showToast('error', 'Failed to load form data');
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError('');
+
+    try {
+      // Validate required fields
+      if (!formData.studentId || !formData.instructorId || !formData.aircraftId || 
+          !formData.scheduledTime || !formData.departureLocationId) {
+        setFormError('Please fill in all required fields');
+        setFormLoading(false);
+        return;
+      }
+
+      // Create booking
+      const { data, error } = await supabase
+        .from('flight_bookings')
+        .insert([
+          {
+            student_id: formData.studentId,
+            instructor_id: formData.instructorId,
+            aircraft_id: formData.aircraftId,
+            scheduled_time: formData.scheduledTime,
+            departure_location_id: formData.departureLocationId,
+            arrival_location_id: formData.arrivalLocationId || formData.departureLocationId,
+            route: formData.route || null,
+            status: 'SCHEDULED',
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Success - close modal and refetch data
+      showToast('success', 'Flight booking created successfully!');
+      setShowCreateModal(false);
+      refetch();
+      
+      // Reset form
+      setFormData({
+        studentId: '',
+        instructorId: '',
+        aircraftId: '',
+        scheduledTime: '',
+        departureLocationId: '',
+        arrivalLocationId: '',
+        route: '',
+      });
+    } catch (error: any) {
+      console.error('Error creating booking:', error);
+      const errorMsg = error.message || 'Failed to create booking. Please try again.';
+      setFormError(errorMsg);
+      showToast('error', errorMsg);
+    } finally {
+      setFormLoading(false);
+    }
+  };
 
   // Filter bookings based on search and status
   const filteredBookings = bookings?.filter(booking => {
@@ -207,8 +321,8 @@ export default function Bookings() {
       {/* Create Booking Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl animate-slideUp">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl animate-slideUp max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white flex items-center justify-between p-6 border-b border-gray-200 z-10">
               <h2 className="text-2xl font-bold text-gray-900">Schedule New Flight</h2>
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -217,13 +331,179 @@ export default function Bookings() {
                 <X className="h-6 w-6" />
               </button>
             </div>
-            <div className="p-6">
-              <div className="text-center py-12">
-                <Plane className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-                <p className="text-gray-600 mb-4">Booking form coming soon...</p>
-                <p className="text-sm text-gray-500">We're building an amazing booking experience for you!</p>
-              </div>
-            </div>
+
+            <form onSubmit={handleSubmit} className="p-6">
+              {formError && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-sm text-red-800">{formError}</p>
+                </div>
+              )}
+
+              {dataLoading ? (
+                <div className="py-12 text-center">
+                  <Loader2 className="h-12 w-12 text-blue-500 mx-auto mb-4 animate-spin" />
+                  <p className="text-gray-600">Loading form data...</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Student Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Student <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.studentId}
+                      onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      required
+                    >
+                      <option value="">Select a student</option>
+                      {students.map((student) => (
+                        <option key={student.id} value={student.id}>
+                          {student.name} ({student.training_level})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Instructor Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Instructor <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.instructorId}
+                      onChange={(e) => setFormData({ ...formData, instructorId: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      required
+                    >
+                      <option value="">Select an instructor</option>
+                      {instructors.map((instructor) => (
+                        <option key={instructor.id} value={instructor.id}>
+                          {instructor.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Aircraft Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Aircraft <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.aircraftId}
+                      onChange={(e) => setFormData({ ...formData, aircraftId: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      required
+                    >
+                      <option value="">Select an aircraft</option>
+                      {aircraft.map((ac) => (
+                        <option key={ac.id} value={ac.id}>
+                          {ac.tail_number} - {ac.model}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Scheduled Time */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Scheduled Date & Time <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={formData.scheduledTime}
+                      onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      required
+                    />
+                  </div>
+
+                  {/* Departure Location */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Departure Location <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.departureLocationId}
+                      onChange={(e) => setFormData({ ...formData, departureLocationId: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      required
+                    >
+                      <option value="">Select departure location</option>
+                      {locations.map((location) => (
+                        <option key={location.id} value={location.id}>
+                          {location.icao_code} - {location.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Arrival Location */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Arrival Location (optional)
+                    </label>
+                    <select
+                      value={formData.arrivalLocationId}
+                      onChange={(e) => setFormData({ ...formData, arrivalLocationId: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    >
+                      <option value="">Same as departure (local flight)</option>
+                      {locations.map((location) => (
+                        <option key={location.id} value={location.id}>
+                          {location.icao_code} - {location.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Route */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Route / Notes (optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.route}
+                      onChange={(e) => setFormData({ ...formData, route: e.target.value })}
+                      placeholder="e.g., Local area, pattern work, cross-country"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+
+                  {/* Submit Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="submit"
+                      disabled={formLoading}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {formLoading ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          Creating...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-5 w-5" />
+                          Create Booking
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateModal(false)}
+                      disabled={formLoading}
+                      className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </form>
           </div>
         </div>
       )}
