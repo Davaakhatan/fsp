@@ -41,47 +41,47 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
     // The geocoding will kick in after the API call completes
   }
 
-  // Program type filtering
-  if (filters.program_types && filters.program_types.length > 0) {
+  // Program type filtering (skip if using RPC - it returns filtered results)
+  if (filters.program_types && filters.program_types.length > 0 && !isUsingRPC) {
     query = query.contains('programs_offered', filters.program_types);
   }
 
-  // Budget filtering
-  if (filters.min_budget) {
+  // Budget filtering (skip if using RPC)
+  if (filters.min_budget && !isUsingRPC) {
     query = query.gte('min_program_cost', filters.min_budget);
   }
-  if (filters.max_budget) {
+  if (filters.max_budget && !isUsingRPC) {
     query = query.lte('max_program_cost', filters.max_budget);
   }
 
-  // Trust tier filtering
-  if (filters.trust_tiers && filters.trust_tiers.length > 0) {
+  // Trust tier filtering (skip if using RPC)
+  if (filters.trust_tiers && filters.trust_tiers.length > 0 && !isUsingRPC) {
     query = query.in('trust_tier', filters.trust_tiers);
   }
 
-  // VA approved
-  if (filters.is_va_approved) {
+  // VA approved (skip if using RPC)
+  if (filters.is_va_approved && !isUsingRPC) {
     query = query.eq('is_veteran_approved', true);
   }
 
-  // Training type
-  if (filters.training_type === 'part_61') {
+  // Training type (skip if using RPC)
+  if (filters.training_type === 'part_61' && !isUsingRPC) {
     query = query.eq('is_part_61', true);
-  } else if (filters.training_type === 'part_141') {
+  } else if (filters.training_type === 'part_141' && !isUsingRPC) {
     query = query.eq('is_part_141', true);
   }
 
-  // Sorting
-  if (filters.sort_by === 'price_low') {
-    query = query.order('min_program_cost', { ascending: true, nullsFirst: false });
-  } else if (filters.sort_by === 'price_high') {
-    query = query.order('max_program_cost', { ascending: false, nullsFirst: false });
-  } else if (filters.sort_by === 'rating') {
-    query = query.order('avg_rating', { ascending: false });
-  } else if (filters.sort_by === 'name') {
-    query = query.order('name', { ascending: true });
-  } else if (filters.sort_by === 'distance' && filters.latitude) {
-    // Distance sorting handled by PostGIS RPC
+  // Sorting (skip if using RPC - it already sorts by distance)
+  if (!isUsingRPC) {
+    if (filters.sort_by === 'price_low') {
+      query = query.order('min_program_cost', { ascending: true, nullsFirst: false });
+    } else if (filters.sort_by === 'price_high') {
+      query = query.order('max_program_cost', { ascending: false, nullsFirst: false });
+    } else if (filters.sort_by === 'rating') {
+      query = query.order('avg_rating', { ascending: false });
+    } else if (filters.sort_by === 'name') {
+      query = query.order('name', { ascending: true });
+    }
   }
 
   const { data, error } = await query;
@@ -91,6 +91,7 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
     throw new Error(error.message);
   }
 
+  console.log('✅ Search results:', data?.length, 'schools found');
   return data || [];
 }
 
