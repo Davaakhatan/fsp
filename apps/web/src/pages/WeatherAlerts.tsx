@@ -1,14 +1,9 @@
 import { useState } from 'react';
 import { 
   AlertCircle, 
-  Cloud, 
-  Wind, 
-  Eye, 
   X,
   MapPin,
   Clock,
-  User,
-  Plane,
   Calendar,
   CheckCircle,
   Loader2
@@ -98,7 +93,7 @@ export default function WeatherAlerts() {
     }
   };
 
-  const handleSelectOption = async (option: RescheduleOption) => {
+  const handleSelectOption = async (_option: RescheduleOption) => {
     setSelectingOption(true);
     try {
       // In a real app, this would update the booking and send notifications

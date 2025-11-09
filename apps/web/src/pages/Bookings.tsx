@@ -89,7 +89,7 @@ export default function Bookings() {
       }
 
       // Create booking
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('flight_bookings')
         .insert([
           {

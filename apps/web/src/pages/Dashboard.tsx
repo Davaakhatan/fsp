@@ -8,7 +8,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useDashboardStats, useBookings, useWeatherAlerts } from '../hooks/useApi';
-import { formatDateTime, formatTime } from '@fsp/shared';
+import { formatTime } from '@fsp/shared';
 
 export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useDashboardStats();

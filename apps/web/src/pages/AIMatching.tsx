@@ -212,6 +212,11 @@ export const AIMatching: React.FC = () => {
 
   const currentQuestion = questions[step];
 
+  // Safety check
+  if (!currentQuestion) {
+    return null;
+  }
+
   if (matches.length > 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12">
