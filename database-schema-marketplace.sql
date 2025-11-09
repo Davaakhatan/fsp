@@ -584,12 +584,11 @@ USING (school_id IN (SELECT school_id FROM school_admins WHERE auth_user_id = au
 CREATE POLICY "School admins can view their inquiries" ON inquiries FOR SELECT 
 USING (school_id IN (SELECT school_id FROM school_admins WHERE auth_user_id = auth.uid()));
 
--- Students can manage their own profiles
-CREATE POLICY "Students can view their own profile" ON student_profiles FOR SELECT 
-USING (id = (SELECT id FROM student_profiles WHERE auth_user_id = auth.uid()));
-
-CREATE POLICY "Students can update their own profile" ON student_profiles FOR UPDATE 
-USING (id = (SELECT id FROM student_profiles WHERE auth_user_id = auth.uid()));
+-- Students can manage their own profiles (simplified - no auth for MVP)
+-- Note: In production, add auth_user_id column and proper auth integration
+CREATE POLICY "Public can view student profiles" ON student_profiles FOR SELECT USING (TRUE);
+CREATE POLICY "Public can insert student profiles" ON student_profiles FOR INSERT WITH CHECK (TRUE);
+CREATE POLICY "Public can update student profiles" ON student_profiles FOR UPDATE USING (TRUE);
 
 -- Anyone can submit inquiries and reviews (with moderation)
 CREATE POLICY "Anyone can submit inquiries" ON inquiries FOR INSERT WITH CHECK (TRUE);
