@@ -1,4 +1,4 @@
-// Booking types
+// Booking types (Legacy - for old weather system)
 export type BookingStatus = 
   | 'SCHEDULED' 
   | 'WEATHER_HOLD' 
@@ -44,7 +44,7 @@ export interface Location {
   timezone: string;
 }
 
-// Weather types
+// Weather types (Legacy)
 export interface WeatherData {
   visibility: number; // miles
   ceiling: number | null; // feet
@@ -84,7 +84,7 @@ export interface WeatherCheck {
   createdAt: Date;
 }
 
-// Reschedule types
+// Reschedule types (Legacy)
 export interface RescheduleOption {
   id: string;
   conflictEventId: string;
@@ -97,7 +97,7 @@ export interface RescheduleOption {
   createdAt: Date;
 }
 
-// Event types
+// Event types (Legacy)
 export interface DomainEvent {
   type: string;
   aggregateId: string;
@@ -126,7 +126,7 @@ export interface WeatherConflictEvent extends DomainEvent {
   };
 }
 
-// Notification types
+// Notification types (Legacy)
 export interface Notification {
   id: string;
   recipientId: string;
@@ -142,3 +142,7 @@ export interface Notification {
   createdAt: Date;
 }
 
+// =====================================================
+// NEW MARKETPLACE TYPES
+// =====================================================
+export * from './marketplace';
