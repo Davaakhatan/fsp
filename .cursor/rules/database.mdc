@@ -1,0 +1,457 @@
+Description: Database and Prisma patterns
+Globs: packages/database/**/*.*, apps/api/src/repositories/**/*.*
+
+# Database & Prisma Rules
+
+## Schema Design Principles
+
+### Use UUID for Primary Keys
+```prisma
+model Booking {
+  id String @id @default(uuid())
+}
+```
+
+### Add Timestamps to All Models
+```prisma
+model Booking {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+
+### Index Frequently Queried Fields
+```prisma
+model Booking {
+  scheduledTime DateTime
+  studentId     String
+  status        String
+  
+  @@index([scheduledTime])
+  @@index([studentId])
+  @@index([status])
+}
+```
+
+## Repository Pattern
+
+### Always Use Repositories
+Never call Prisma directly from services or routes:
+
+```typescript
+// repositories/booking.repository.ts
+export class BookingRepository {
+  constructor(private prisma: PrismaClient) {}
+  
+  async findById(id: string): Promise<Booking | null> {
+    return this.prisma.booking.findUnique({
+      where: { id },
+      include: {
+        student: true,
+        departureLocation: true
+      }
+    });
+  }
+  
+  async findUpcoming(hoursAhead: number): Promise<Booking[]> {
+    const cutoffTime = new Date();
+    cutoffTime.setHours(cutoffTime.getHours() + hoursAhead);
+    
+    return this.prisma.booking.findMany({
+      where: {
+        scheduledTime: {
+          gte: new Date(),
+          lte: cutoffTime
+        },
+        status: 'SCHEDULED'
+      },
+      include: {
+        student: true,
+        instructor: true,
+        departureLocation: true,
+        destinationLocation: true
+      },
+      orderBy: {
+        scheduledTime: 'asc'
+      }
+    });
+  }
+  
+  async create(data: CreateBookingData): Promise<Booking> {
+    return this.prisma.booking.create({
+      data,
+      include: {
+        student: true,
+        instructor: true
+      }
+    });
+  }
+  
+  async updateStatus(
+    id: string,
+    status: BookingStatus
+  ): Promise<Booking> {
+    return this.prisma.booking.update({
+      where: { id },
+      data: { status }
+    });
+  }
+}
+```
+
+## Transaction Handling
+
+### Use Transactions for Multi-Step Operations
+```typescript
+async rescheduleBooking(
+  oldBookingId: string,
+  newTime: Date
+): Promise<{ oldBooking: Booking; newBooking: Booking }> {
+  return this.prisma.$transaction(async (tx) => {
+    // Cancel old booking
+    const oldBooking = await tx.booking.update({
+      where: { id: oldBookingId },
+      data: { status: 'RESCHEDULED' }
+    });
+    
+    // Create new booking
+    const newBooking = await tx.booking.create({
+      data: {
+        ...oldBooking,
+        id: undefined, // Generate new ID
+        scheduledTime: newTime,
+        status: 'SCHEDULED',
+        originalBookingId: oldBookingId
+      }
+    });
+    
+    // Log event
+    await tx.event.create({
+      data: {
+        eventType: 'RescheduleConfirmed',
+        aggregateId: oldBookingId,
+        aggregateType: 'Booking',
+        payload: {
+          oldBookingId,
+          newBookingId: newBooking.id,
+          newTime
+        }
+      }
+    });
+    
+    return { oldBooking, newBooking };
+  });
+}
+```
+
+## Query Optimization
+
+### Select Only Needed Fields
+```typescript
+// Good - select specific fields
+const bookings = await prisma.booking.findMany({
+  select: {
+    id: true,
+    scheduledTime: true,
+    status: true,
+    student: {
+      select: {
+        name: true,
+        email: true
+      }
+    }
+  }
+});
+
+// Avoid - fetching everything
+const bookings = await prisma.booking.findMany({
+  include: {
+    student: true,
+    instructor: true,
+    aircraft: true,
+    // ... everything
+  }
+});
+```
+
+### Use Cursor-Based Pagination for Large Datasets
+```typescript
+async function getBookings(cursor?: string, take = 50) {
+  return prisma.booking.findMany({
+    take,
+    skip: cursor ? 1 : 0,
+    cursor: cursor ? { id: cursor } : undefined,
+    orderBy: { scheduledTime: 'desc' }
+  });
+}
+```
+
+## Migrations
+
+### Always Review Generated Migrations
+```bash
+# Generate migration
+pnpm prisma migrate dev --name add_weather_checks
+
+# Review the SQL in prisma/migrations/
+# Make manual edits if needed
+
+# Apply migration
+pnpm prisma migrate deploy
+```
+
+### Never Edit Existing Migrations
+Create new migrations instead:
+```bash
+# Wrong - editing existing migration
+# Right - create new migration to fix issue
+pnpm prisma migrate dev --name fix_weather_checks
+```
+
+### Seed Data for Development
+```typescript
+// prisma/seed.ts
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  // Create locations
+  const location = await prisma.location.create({
+    data: {
+      name: 'KPAE Paine Field',
+      latitude: 47.9063,
+      longitude: -122.2817,
+      timezone: 'America/Los_Angeles'
+    }
+  });
+  
+  // Create students
+  const student = await prisma.student.create({
+    data: {
+      name: 'John Doe',
+      email: 'john@example.com',
+      phone: '555-0100',
+      trainingLevel: 'STUDENT'
+    }
+  });
+  
+  // Create bookings
+  await prisma.booking.create({
+    data: {
+      studentId: student.id,
+      instructorId: '...', 
+      aircraftId: '...',
+      departureLocationId: location.id,
+      scheduledTime: new Date('2025-11-15T10:00:00Z'),
+      durationMinutes: 60,
+      status: 'SCHEDULED'
+    }
+  });
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
+```
+
+## Connection Management
+
+### Use Connection Pooling
+```typescript
+// database/src/client.ts
+import { PrismaClient } from '@prisma/client';
+
+// Singleton pattern
+let prisma: PrismaClient;
+
+export function getPrismaClient(): PrismaClient {
+  if (!prisma) {
+    prisma = new PrismaClient({
+      log: process.env.NODE_ENV === 'development' 
+        ? ['query', 'error', 'warn'] 
+        : ['error'],
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL
+        }
+      }
+    });
+  }
+  return prisma;
+}
+
+// Graceful shutdown
+process.on('beforeExit', async () => {
+  await prisma?.$disconnect();
+});
+```
+
+## Event Sourcing Pattern
+
+### Store All Domain Events
+```typescript
+async function publishEvent(event: DomainEvent): Promise<void> {
+  await prisma.event.create({
+    data: {
+      eventType: event.type,
+      aggregateId: event.aggregateId,
+      aggregateType: event.aggregateType,
+      payload: event.payload,
+      metadata: {
+        timestamp: new Date(),
+        userId: event.userId,
+        correlationId: event.correlationId
+      }
+    }
+  });
+}
+```
+
+### Query Event History
+```typescript
+async function getBookingHistory(bookingId: string): Promise<DomainEvent[]> {
+  const events = await prisma.event.findMany({
+    where: {
+      aggregateType: 'Booking',
+      aggregateId: bookingId
+    },
+    orderBy: {
+      createdAt: 'asc'
+    }
+  });
+  
+  return events.map(e => ({
+    type: e.eventType,
+    aggregateId: e.aggregateId,
+    payload: e.payload as any,
+    timestamp: e.createdAt
+  }));
+}
+```
+
+## Data Validation
+
+### Validate at Database Level
+```prisma
+model Student {
+  email         String  @unique
+  trainingLevel String  // Will add CHECK constraint in migration
+  
+  @@index([email])
+}
+```
+
+Then add CHECK constraint in migration:
+```sql
+ALTER TABLE "Student" ADD CONSTRAINT "training_level_check" 
+  CHECK (training_level IN ('STUDENT', 'PRIVATE', 'INSTRUMENT'));
+```
+
+## Testing
+
+### Use Test Database
+```typescript
+// tests/setup.ts
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.TEST_DATABASE_URL
+    }
+  }
+});
+
+beforeEach(async () => {
+  // Clean database
+  await prisma.booking.deleteMany();
+  await prisma.student.deleteMany();
+  // ... other tables
+});
+
+afterAll(async () => {
+  await prisma.$disconnect();
+});
+```
+
+## Performance Monitoring
+
+### Log Slow Queries
+```typescript
+const prisma = new PrismaClient({
+  log: [
+    { emit: 'event', level: 'query' }
+  ]
+});
+
+prisma.$on('query', (e) => {
+  if (e.duration > 100) { // Log queries > 100ms
+    console.warn('Slow query detected', {
+      query: e.query,
+      duration: e.duration,
+      params: e.params
+    });
+  }
+});
+```
+
+## Common Pitfalls
+
+### Avoid N+1 Queries
+```typescript
+// Bad - N+1 query
+const bookings = await prisma.booking.findMany();
+for (const booking of bookings) {
+  const student = await prisma.student.findUnique({
+    where: { id: booking.studentId }
+  });
+}
+
+// Good - use include
+const bookings = await prisma.booking.findMany({
+  include: { student: true }
+});
+```
+
+### Handle Unique Constraint Violations
+```typescript
+try {
+  await prisma.student.create({
+    data: { email: 'duplicate@example.com', ... }
+  });
+} catch (error) {
+  if (error.code === 'P2002') {
+    throw new ConflictError('Email already exists');
+  }
+  throw error;
+}
+```
+
+### Use Proper Date Comparisons
+```typescript
+// Good - Date objects
+const bookings = await prisma.booking.findMany({
+  where: {
+    scheduledTime: {
+      gte: new Date(),
+      lte: addHours(new Date(), 24)
+    }
+  }
+});
+
+// Bad - string comparison
+const bookings = await prisma.booking.findMany({
+  where: {
+    scheduledTime: {
+      gte: '2025-11-10',  // Unreliable
+    }
+  }
+});
+```

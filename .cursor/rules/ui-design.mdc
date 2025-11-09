@@ -1,0 +1,392 @@
+Description: Frontend design standards and UI patterns
+Globs: apps/web/src/**/*.tsx, apps/web/src/**/*.css
+
+# UI/UX Design Standards
+
+## Design Principles
+
+### 1. Minimalist First
+- Clean, uncluttered interfaces
+- White space is your friend
+- Focus on essential information only
+- Remove unnecessary elements
+
+### 2. User Friendly
+- Intuitive navigation
+- Clear labels and actions
+- Immediate feedback for all actions
+- Forgiving error handling
+
+### 3. Not Too Crowded
+- Maximum 3-4 main items per view
+- Group related information
+- Use progressive disclosure (show more on demand)
+- Prioritize information hierarchy
+
+### 4. Modern
+- Clean typography (Inter or similar)
+- Subtle shadows and borders
+- Smooth transitions
+- Contemporary color palette
+
+## Design System
+
+### Colors
+```css
+/* Primary Colors */
+--primary-50: #eff6ff;   /* Lightest blue */
+--primary-500: #3b82f6;  /* Main blue */
+--primary-600: #2563eb;  /* Hover blue */
+--primary-700: #1d4ed8;  /* Active blue */
+
+/* Neutral Colors */
+--gray-50: #f9fafb;      /* Background */
+--gray-100: #f3f4f6;     /* Subtle background */
+--gray-200: #e5e7eb;     /* Borders */
+--gray-400: #9ca3af;     /* Disabled text */
+--gray-600: #4b5563;     /* Secondary text */
+--gray-900: #111827;     /* Primary text */
+
+/* Status Colors */
+--success: #10b981;      /* Green */
+--warning: #f59e0b;      /* Amber */
+--danger: #ef4444;       /* Red */
+--info: #3b82f6;         /* Blue */
+```
+
+### Typography
+```tsx
+// Headings
+<h1 className="text-3xl font-bold text-gray-900">       // Page titles
+<h2 className="text-2xl font-semibold text-gray-900">   // Section headers
+<h3 className="text-lg font-medium text-gray-900">      // Subsections
+
+// Body Text
+<p className="text-base text-gray-600">                 // Normal text
+<p className="text-sm text-gray-500">                   // Secondary text
+<p className="text-xs text-gray-400">                   // Tertiary/helper text
+
+// Use Inter font throughout
+font-family: 'Inter', system-ui, sans-serif;
+```
+
+### Spacing
+```tsx
+// Use Tailwind's spacing scale (4px base)
+gap-2   // 8px  - tight spacing
+gap-4   // 16px - default spacing
+gap-6   // 24px - comfortable spacing
+gap-8   // 32px - section spacing
+gap-12  // 48px - large section spacing
+```
+
+### Components
+
+#### Buttons
+```tsx
+// Primary Button
+<button className="px-4 py-2 bg-primary-500 text-white rounded-lg 
+  hover:bg-primary-600 transition-colors shadow-sm
+  disabled:opacity-50 disabled:cursor-not-allowed">
+  Action
+</button>
+
+// Secondary Button
+<button className="px-4 py-2 bg-white text-gray-700 rounded-lg 
+  border border-gray-200 hover:bg-gray-50 transition-colors">
+  Cancel
+</button>
+
+// Ghost Button (icon only)
+<button className="p-2 text-gray-600 hover:text-gray-900 
+  hover:bg-gray-100 rounded-lg transition-colors">
+  <Icon />
+</button>
+```
+
+#### Cards
+```tsx
+// Minimalist card - subtle, clean
+<div className="bg-white rounded-xl border border-gray-200 p-6 
+  hover:shadow-md transition-shadow">
+  {content}
+</div>
+
+// Status card - with indicator
+<div className="bg-white rounded-xl border-l-4 border-blue-500 
+  p-6 shadow-sm">
+  {content}
+</div>
+```
+
+#### Alerts
+```tsx
+// Weather Alert (danger)
+<div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+  <div className="flex items-start gap-3">
+    <AlertIcon className="text-red-500 flex-shrink-0" />
+    <div>
+      <h4 className="font-medium text-red-900">Weather Conflict</h4>
+      <p className="text-sm text-red-700">...</p>
+    </div>
+  </div>
+</div>
+
+// Info Alert
+<div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+  ...
+</div>
+```
+
+#### Inputs
+```tsx
+// Text Input
+<input 
+  className="w-full px-4 py-2 border border-gray-200 rounded-lg
+    focus:outline-none focus:ring-2 focus:ring-primary-500 
+    focus:border-transparent transition-all
+    placeholder:text-gray-400"
+  placeholder="Search..."
+/>
+
+// Select
+<select className="w-full px-4 py-2 border border-gray-200 rounded-lg
+  focus:outline-none focus:ring-2 focus:ring-primary-500 
+  bg-white appearance-none">
+  <option>Select...</option>
+</select>
+```
+
+#### Badges/Status Pills
+```tsx
+// Status badge - minimalist
+<span className="inline-flex items-center px-3 py-1 rounded-full 
+  text-xs font-medium bg-green-100 text-green-700">
+  Scheduled
+</span>
+
+// Danger status
+<span className="inline-flex items-center px-3 py-1 rounded-full 
+  text-xs font-medium bg-red-100 text-red-700">
+  Canceled
+</span>
+```
+
+## Layout Patterns
+
+### Dashboard Layout
+```tsx
+// Clean, spacious layout
+<div className="min-h-screen bg-gray-50">
+  {/* Header */}
+  <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+    <div className="max-w-7xl mx-auto px-6 py-4">
+      <h1 className="text-2xl font-bold text-gray-900">
+        Flight Schedule Pro
+      </h1>
+    </div>
+  </header>
+  
+  {/* Main Content */}
+  <main className="max-w-7xl mx-auto px-6 py-8">
+    <div className="space-y-8">
+      {/* Sections with generous spacing */}
+    </div>
+  </main>
+</div>
+```
+
+### Grid Pattern (Not Too Crowded)
+```tsx
+// 1 column on mobile, 2 on tablet, 3 on desktop (max)
+<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+  {items}
+</div>
+
+// For dashboard widgets - max 2 columns
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  {widgets}
+</div>
+```
+
+### Card List (Minimalist)
+```tsx
+// Spacious list with clear separation
+<div className="space-y-4">
+  {items.map(item => (
+    <div key={item.id} className="bg-white rounded-xl border border-gray-200 p-6">
+      {/* Keep content minimal - 3-4 key pieces of info max */}
+    </div>
+  ))}
+</div>
+```
+
+## Animation & Transitions
+
+### Subtle, Professional
+```css
+/* Use consistent timing */
+transition-all duration-200 ease-in-out
+
+/* Hover effects - subtle */
+hover:shadow-md
+hover:scale-[1.01]
+
+/* Loading states */
+animate-pulse
+```
+
+### Loading Skeleton (Minimalist)
+```tsx
+<div className="animate-pulse space-y-4">
+  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+</div>
+```
+
+## Dashboard-Specific Patterns
+
+### Weather Alert Panel
+```tsx
+// Prominent but not overwhelming
+<section className="space-y-4">
+  <h2 className="text-xl font-semibold text-gray-900">Weather Alerts</h2>
+  
+  {alerts.length === 0 ? (
+    <div className="text-center py-12 text-gray-400">
+      <CloudIcon className="mx-auto h-12 w-12 mb-3" />
+      <p>No active weather alerts</p>
+    </div>
+  ) : (
+    <div className="space-y-3">
+      {alerts.map(alert => (
+        // Alert card
+      ))}
+    </div>
+  )}
+</section>
+```
+
+### Flight List (Clean, Scannable)
+```tsx
+<div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+  {flights.map(flight => (
+    <div key={flight.id} className="p-6 hover:bg-gray-50 transition-colors">
+      <div className="flex items-center justify-between">
+        {/* Left: Essential info only */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 mb-2">
+            <h3 className="font-medium text-gray-900">{flight.student}</h3>
+            <StatusBadge status={flight.status} />
+          </div>
+          <p className="text-sm text-gray-500">
+            {formatTime(flight.scheduledTime)} • {flight.location}
+          </p>
+        </div>
+        
+        {/* Right: Action */}
+        <button className="text-gray-400 hover:text-gray-600">
+          <ChevronRightIcon />
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+```
+
+### Metrics Cards (Minimal)
+```tsx
+// Simple, focused metrics
+<div className="bg-white rounded-xl border border-gray-200 p-6">
+  <div className="flex items-center justify-between mb-4">
+    <h3 className="text-sm font-medium text-gray-600">Active Flights</h3>
+    <PlaneIcon className="h-5 w-5 text-gray-400" />
+  </div>
+  <p className="text-3xl font-bold text-gray-900">12</p>
+  <p className="text-xs text-gray-500 mt-1">↑ 2 from yesterday</p>
+</div>
+```
+
+## Icons
+
+### Lucide React (Recommended)
+```bash
+pnpm add lucide-react
+```
+
+```tsx
+import { 
+  Cloud, CloudRain, AlertCircle, CheckCircle,
+  Plane, Calendar, Clock, MapPin, Users
+} from 'lucide-react';
+
+// Use consistently sized
+<Cloud className="h-5 w-5 text-gray-400" />
+```
+
+## Responsive Design
+
+### Mobile First
+```tsx
+// Stack on mobile, side-by-side on desktop
+<div className="flex flex-col lg:flex-row gap-6">
+  <div className="flex-1">Left</div>
+  <div className="flex-1">Right</div>
+</div>
+
+// Hide non-essential on mobile
+<div className="hidden md:block">Secondary info</div>
+```
+
+### Breakpoints
+- Mobile: default (< 640px)
+- Tablet: md (768px+)
+- Desktop: lg (1024px+)
+- Wide: xl (1280px+)
+
+## Empty States
+
+### Minimalist, Helpful
+```tsx
+<div className="text-center py-12">
+  <div className="inline-flex items-center justify-center w-16 h-16 
+    rounded-full bg-gray-100 mb-4">
+    <Icon className="h-8 w-8 text-gray-400" />
+  </div>
+  <h3 className="text-lg font-medium text-gray-900 mb-2">No flights scheduled</h3>
+  <p className="text-sm text-gray-500 mb-4">
+    Schedule your first flight to get started
+  </p>
+  <button className="...">Schedule Flight</button>
+</div>
+```
+
+## Anti-Patterns (Avoid)
+
+❌ Too many colors - stick to color system
+❌ Heavy shadows - use subtle shadows only
+❌ Crowded layouts - generous spacing always
+❌ Too many font weights - max 3 weights
+❌ Complex gradients - solid colors preferred
+❌ Busy backgrounds - clean, simple
+❌ Information overload - progressive disclosure
+❌ Too many borders - use sparingly
+
+## Examples to Follow
+
+✅ Linear - clean, minimal, spacious
+✅ Vercel Dashboard - modern, clear hierarchy
+✅ Stripe Dashboard - clear data visualization
+✅ Notion - excellent use of white space
+
+## Component Library Recommendation
+
+Use **shadcn/ui** with Tailwind:
+- Pre-built accessible components
+- Fully customizable
+- Copy-paste, no npm package bloat
+- Perfect for minimalist designs
+
+```bash
+pnpm dlx shadcn-ui@latest init
+```

@@ -1,0 +1,345 @@
+Description: TypeScript and type safety rules
+Globs: **/*.ts, **/*.tsx
+
+# TypeScript Standards
+
+## Configuration
+- Always use `strict: true` in tsconfig.json
+- Enable `noUncheckedIndexedAccess`
+- Enable `noImplicitReturns`
+- Enable `noFallthroughCasesInSwitch`
+
+## Type Safety Practices
+
+### No Any Types
+```typescript
+// Bad
+function process(data: any) { ... }
+
+// Good
+function process(data: unknown) {
+  if (isValidData(data)) {
+    // Type guard narrows to specific type
+  }
+}
+```
+
+### Proper Type Guards
+```typescript
+// Define type predicates
+function isStudent(entity: Student | Instructor): entity is Student {
+  return 'trainingLevel' in entity;
+}
+
+// Use discriminated unions
+type BookingEvent = 
+  | { type: 'created'; booking: Booking }
+  | { type: 'canceled'; reason: string }
+  | { type: 'rescheduled'; newTime: Date };
+
+function handleEvent(event: BookingEvent) {
+  switch (event.type) {
+    case 'created':
+      // TypeScript knows event.booking exists
+      break;
+    case 'canceled':
+      // TypeScript knows event.reason exists
+      break;
+  }
+}
+```
+
+### Zod for Runtime Validation
+All external data must be validated:
+```typescript
+import { z } from 'zod';
+
+// Define schema
+const weatherDataSchema = z.object({
+  visibility: z.number().positive(),
+  windSpeed: z.number().nonnegative(),
+  conditions: z.array(z.string())
+});
+
+// Infer TypeScript type from schema
+type WeatherData = z.infer<typeof weatherDataSchema>;
+
+// Validate at runtime
+const weatherData = weatherDataSchema.parse(apiResponse);
+```
+
+### Shared Types
+Keep shared types in `packages/shared/src/types/`:
+```typescript
+// packages/shared/src/types/booking.ts
+export interface Booking {
+  id: string;
+  studentId: string;
+  scheduledTime: Date;
+  status: BookingStatus;
+}
+
+export enum BookingStatus {
+  Scheduled = 'SCHEDULED',
+  WeatherHold = 'WEATHER_HOLD',
+  Canceled = 'CANCELED'
+}
+```
+
+## Function Signatures
+
+### Explicit Return Types
+```typescript
+// Good - explicit return type
+async function getBooking(id: string): Promise<Booking | null> {
+  return bookingRepository.findById(id);
+}
+
+// Bad - inferred return type (less clear)
+async function getBooking(id: string) {
+  return bookingRepository.findById(id);
+}
+```
+
+### Use Readonly When Appropriate
+```typescript
+// Immutable data
+interface WeatherMinimums {
+  readonly visibility: number;
+  readonly windSpeed: number;
+}
+
+// Prevent array mutations
+function processBookings(bookings: readonly Booking[]): void {
+  // bookings.push() would be a compile error
+}
+```
+
+## Error Handling
+
+### Typed Errors
+```typescript
+// Define error types
+class NotFoundError extends Error {
+  constructor(
+    public readonly entity: string,
+    public readonly id: string
+  ) {
+    super(`${entity} with id ${id} not found`);
+    this.name = 'NotFoundError';
+  }
+}
+
+// Use type guards for error handling
+function isNotFoundError(error: unknown): error is NotFoundError {
+  return error instanceof NotFoundError;
+}
+
+// Handle with types
+try {
+  await bookingService.get(id);
+} catch (error) {
+  if (isNotFoundError(error)) {
+    return res.status(404).json({ error: error.message });
+  }
+  throw error;
+}
+```
+
+## Generic Types
+
+### Use Generics for Reusability
+```typescript
+// Generic repository
+interface Repository<T> {
+  findById(id: string): Promise<T | null>;
+  findAll(): Promise<T[]>;
+  create(data: Omit<T, 'id'>): Promise<T>;
+}
+
+class BookingRepository implements Repository<Booking> {
+  // Implementation
+}
+```
+
+## Date Handling
+
+### Always Use Date Objects
+```typescript
+// Good - Date objects
+interface Booking {
+  scheduledTime: Date;
+  createdAt: Date;
+}
+
+// Bad - string dates (type unsafe)
+interface Booking {
+  scheduledTime: string;
+  createdAt: string;
+}
+```
+
+### Use date-fns for Manipulation
+```typescript
+import { addHours, isBefore, format } from 'date-fns';
+
+const checkTime = addHours(new Date(), 24);
+if (isBefore(booking.scheduledTime, checkTime)) {
+  // Check weather
+}
+```
+
+## Null Safety
+
+### Use Optional Chaining
+```typescript
+// Good
+const ceiling = weatherData?.current?.ceiling;
+
+// Bad
+const ceiling = weatherData && weatherData.current && weatherData.current.ceiling;
+```
+
+### Use Nullish Coalescing
+```typescript
+// Good - only null/undefined use default
+const windSpeed = data.windSpeed ?? 0;
+
+// Bad - falsy values (including 0) use default
+const windSpeed = data.windSpeed || 0;
+```
+
+## Async/Await
+
+### Always Handle Promises
+```typescript
+// Good
+try {
+  const weather = await weatherService.getWeather(location);
+} catch (error) {
+  logger.error('Failed to fetch weather', { error, location });
+  throw error;
+}
+
+// Bad - unhandled promise rejection
+const weather = await weatherService.getWeather(location);
+```
+
+### Type Async Functions Properly
+```typescript
+// Good - explicit Promise return type
+async function generateOptions(
+  conflict: WeatherConflict
+): Promise<RescheduleOption[]> {
+  // Implementation
+}
+
+// Avoid - implicit any in catch
+try {
+  // ...
+} catch (error) {  // error is 'any'
+  console.log(error.message); // Unsafe
+}
+
+// Good - type the error
+try {
+  // ...
+} catch (error) {
+  if (error instanceof Error) {
+    console.log(error.message);
+  }
+}
+```
+
+## Import/Export
+
+### Named Exports Over Default
+```typescript
+// Good - named exports
+export class BookingService { }
+export interface Booking { }
+
+// Import
+import { BookingService, Booking } from './booking';
+
+// Avoid default exports (harder to refactor)
+export default class BookingService { }
+```
+
+### Organize Imports
+```typescript
+// 1. External dependencies
+import { z } from 'zod';
+import { Router } from 'express';
+
+// 2. Internal packages
+import { Booking } from '@fsp/shared/types';
+
+// 3. Local imports
+import { BookingService } from './services/booking';
+import { logger } from './utils/logger';
+```
+
+## Utility Types
+
+### Use Built-in Utility Types
+```typescript
+// Partial - make all properties optional
+type UpdateBookingData = Partial<Booking>;
+
+// Pick - select specific properties
+type BookingSummary = Pick<Booking, 'id' | 'scheduledTime' | 'status'>;
+
+// Omit - exclude specific properties
+type CreateBookingData = Omit<Booking, 'id' | 'createdAt'>;
+
+// Required - make all properties required
+type CompleteBooking = Required<Booking>;
+
+// Readonly - make all properties readonly
+type ImmutableBooking = Readonly<Booking>;
+```
+
+## Enums vs Union Types
+
+### Prefer String Literal Unions
+```typescript
+// Good - string literal union
+type BookingStatus = 'scheduled' | 'weather-hold' | 'canceled';
+
+// Acceptable for exhaustive checks
+enum BookingStatus {
+  Scheduled = 'SCHEDULED',
+  WeatherHold = 'WEATHER_HOLD',
+  Canceled = 'CANCELED'
+}
+```
+
+## Documentation
+
+### Use JSDoc for Public APIs
+```typescript
+/**
+ * Generates optimal reschedule options for a weather conflict
+ * 
+ * @param conflict - The detected weather conflict
+ * @param constraints - Scheduling constraints to consider
+ * @returns Promise resolving to array of reschedule options
+ * @throws {AIServiceError} If AI generation fails
+ * @throws {ValidationError} If constraints are invalid
+ * 
+ * @example
+ * ```typescript
+ * const options = await generateOptions(conflict, {
+ *   maxDaysAhead: 7,
+ *   preferredTimes: ['morning']
+ * });
+ * ```
+ */
+async function generateOptions(
+  conflict: WeatherConflict,
+  constraints: SchedulingConstraints
+): Promise<RescheduleOption[]> {
+  // Implementation
+}
+```

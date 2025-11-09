@@ -1,0 +1,284 @@
+Description: Core project rules and patterns for Flight Schedule Pro
+Globs: **/*
+
+# Flight Schedule Pro - Core Rules
+
+## Project Overview
+This is an AI-powered weather cancellation and rescheduling system for flight schools. The system automatically detects weather conflicts, uses AI to generate optimal reschedule options, and manages notifications to all affected parties.
+
+## Critical Requirements
+
+### Safety First
+- NEVER compromise on weather minimums
+- Training level logic is CRITICAL - different minimums for Student/Private/Instrument pilots
+- Always apply conservative/pessimistic approach to weather decisions
+- Log all safety decisions with complete reasoning
+
+### Type Safety
+- TypeScript strict mode MUST be enabled
+- Never use `any` type - use `unknown` and type guards instead
+- All external API responses MUST be validated with Zod
+- All event payloads MUST be validated with Zod schemas
+
+### Event-Driven Architecture
+- Services communicate via events, not direct calls
+- All domain events MUST be persisted to events table
+- Event handlers MUST be idempotent (can be called multiple times safely)
+- Use transactions for critical state changes
+
+### Data Integrity
+- Bookings are IMMUTABLE - never delete, only link reschedules
+- Use database transactions for multi-step operations
+- Validate state transitions (use state machine pattern)
+- Store complete audit trail (event sourcing)
+
+## Weather Minimums (Critical Logic)
+
+### Student Pilot
+```typescript
+{
+  visibility: { min: 5, unit: 'miles' },
+  ceiling: { min: 3000, unit: 'feet', conditions: 'clear' },
+  windSpeed: { max: 10, unit: 'knots' },
+  windGust: { max: 15, unit: 'knots' },
+  precipitation: false,
+  thunderstorms: false
+}
+```
+
+### Private Pilot
+```typescript
+{
+  visibility: { min: 3, unit: 'miles' },
+  ceiling: { min: 1000, unit: 'feet' },
+  windSpeed: { max: 20, unit: 'knots' },
+  windGust: { max: 25, unit: 'knots' },
+  thunderstorms: false
+}
+```
+
+### Instrument Rated
+```typescript
+{
+  visibility: { min: 1, unit: 'miles' }, // IMC acceptable
+  ceiling: { min: 200, unit: 'feet' },    // Low IFR acceptable
+  windSpeed: { max: 30, unit: 'knots' },
+  windGust: { max: 35, unit: 'knots' },
+  thunderstorms: false,  // Hard stop
+  icing: false           // Hard stop
+}
+```
+
+## Code Patterns
+
+### Repository Pattern
+All database access MUST go through repositories:
+```typescript
+// Good
+const booking = await bookingRepository.findById(id);
+
+// Bad - no direct Prisma calls in services
+const booking = await prisma.booking.findUnique({ where: { id } });
+```
+
+### Service Layer
+Business logic belongs in services, not repositories or routes:
+```typescript
+// Good structure
+Route -> Service -> Repository -> Database
+Route -> Service -> External API
+
+// Bad - business logic in routes
+app.get('/booking', async (req, res) => {
+  const booking = await prisma.booking.findUnique(...);
+  // ... complex logic here - NO!
+});
+```
+
+### Event Publishing
+Always publish events for state changes:
+```typescript
+// After state change
+await bookingService.cancelBooking(id, reason);
+await eventBus.publish(new BookingCanceledEvent({ ... }));
+```
+
+### Error Handling
+Use custom error classes and middleware:
+```typescript
+// Define custom errors
+class WeatherAPIError extends Error { ... }
+
+// Throw with context
+throw new WeatherAPIError('Failed to fetch weather', { location, cause });
+
+// Catch in middleware
+app.use((err, req, res, next) => {
+  logger.error({ err, req });
+  res.status(err.statusCode || 500).json({ error: err.message });
+});
+```
+
+## AI Integration Rules
+
+### Structured Output Required
+NEVER parse free-form AI text. Always use structured output:
+```typescript
+// Good
+const { object } = await generateObject({
+  model: openai('gpt-4-turbo'),
+  schema: rescheduleOptionsSchema,
+  prompt: ...
+});
+
+// Bad - parsing text
+const text = await generateText({ ... });
+const options = parseRescheduleText(text); // Fragile!
+```
+
+### Validate All AI Outputs
+AI can hallucinate - validate everything:
+```typescript
+const options = await aiService.generateOptions(conflict);
+
+// Validate each option
+const validOptions = await Promise.all(
+  options.map(async (opt) => {
+    const isValid = await validateOption(opt);
+    return isValid ? opt : null;
+  })
+).then(opts => opts.filter(Boolean));
+```
+
+### Fallback Algorithm
+If AI fails, use deterministic fallback:
+```typescript
+try {
+  return await aiService.generateOptions(conflict);
+} catch (error) {
+  logger.warn('AI failed, using fallback', { error });
+  return simpleFallbackScheduler.generateOptions(conflict);
+}
+```
+
+## Performance Rules
+
+### Caching Strategy
+- Weather data: 30 minutes TTL
+- Student profiles: 1 hour TTL
+- Location data: 24 hours TTL
+- Never cache: booking status, conflict alerts
+
+### Database Queries
+- Always use indexes for time-based queries
+- Use `select` to limit returned fields
+- Batch queries when possible
+- Use connection pooling
+
+### API Rate Limits
+- OpenWeatherMap: Max 1,000 calls/day (free tier)
+- Batch location checks when possible
+- Use aggressive caching
+- Monitor usage daily
+
+## Testing Requirements
+
+### Unit Tests
+- Coverage target: >80%
+- Mock all external dependencies
+- Test edge cases and error paths
+- Use descriptive test names
+
+### Integration Tests
+- Test service interactions
+- Use test database
+- Test event flow end-to-end
+- Clean up after each test
+
+### E2E Tests
+- Test critical user journeys
+- Use Playwright
+- Run in CI/CD
+- Keep tests fast (<5 min total)
+
+## Documentation Standards
+
+### Code Comments
+- Explain WHY, not WHAT
+- Document complex algorithms
+- Add JSDoc for public APIs
+- Include examples for tricky code
+
+### Git Commits
+- Use conventional commits
+- Reference issues/tickets
+- Keep commits focused
+- Write descriptive messages
+
+## Security
+
+### API Keys
+- NEVER commit API keys
+- Use environment variables
+- Store in Azure Key Vault (production)
+- Rotate keys regularly
+
+### Input Validation
+- Validate all user inputs with Zod
+- Sanitize before database queries
+- Use parameterized queries (Prisma does this)
+- Validate file uploads (if added)
+
+### Rate Limiting
+- Implement on all public endpoints
+- Protect against DOS attacks
+- Log suspicious activity
+
+## Deployment
+
+### Environment Separation
+- Development: Local Docker
+- Staging: Azure (separate resources)
+- Production: Azure (separate resources)
+
+### Zero-Downtime Deployments
+- Use database migrations
+- Support backward compatibility
+- Use feature flags for risky changes
+- Have rollback plan
+
+## Monitoring & Observability
+
+### Logging
+- Use structured logging (JSON)
+- Include request IDs for tracing
+- Log all errors with context
+- Never log sensitive data (passwords, API keys)
+
+### Metrics to Track
+- API response times
+- Weather check duration
+- AI generation time
+- Notification delivery rate
+- Database query performance
+- Event processing lag
+
+### Alerts
+- Weather service down > 5 minutes
+- Database connection errors
+- AI service errors > 10% rate
+- Notification delivery < 90%
+- Disk space < 10%
+
+## Common Pitfalls to Avoid
+
+1. **Don't bypass validation** - Always validate AI outputs
+2. **Don't use direct Prisma calls in routes** - Use repositories
+3. **Don't forget transactions** - Critical for booking state changes
+4. **Don't ignore race conditions** - Use proper locking
+5. **Don't skip error handling** - Wrap external calls in try-catch
+6. **Don't hardcode values** - Use environment variables
+7. **Don't trust user input** - Always validate
+8. **Don't forget indexes** - Critical for time-based queries
+9. **Don't skip tests** - Write tests as you code
+10. **Don't leak secrets** - Check .env files aren't committed

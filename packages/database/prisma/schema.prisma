@@ -1,0 +1,197 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TrainingLevel {
+  STUDENT
+  PRIVATE
+  INSTRUMENT
+}
+
+enum BookingStatus {
+  SCHEDULED
+  WEATHER_HOLD
+  CANCELED
+  RESCHEDULED
+  COMPLETED
+}
+
+model Student {
+  id            String        @id @default(uuid())
+  name          String
+  email         String        @unique
+  phone         String?
+  trainingLevel TrainingLevel
+  
+  bookings      Booking[]
+  notifications Notification[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([email])
+}
+
+model Instructor {
+  id       String    @id @default(uuid())
+  name     String
+  email    String    @unique
+  phone    String?
+  bookings Booking[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([email])
+}
+
+model Aircraft {
+  id           String    @id @default(uuid())
+  registration String    @unique
+  model        String
+  bookings     Booking[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Location {
+  id        String   @id @default(uuid())
+  name      String
+  latitude  Decimal  @db.Decimal(9, 6)
+  longitude Decimal  @db.Decimal(9, 6)
+  timezone  String
+  
+  departureBookings   Booking[]      @relation("DepartureLocation")
+  destinationBookings Booking[]      @relation("DestinationLocation")
+  weatherChecks       WeatherCheck[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Booking {
+  id                    String        @id @default(uuid())
+  studentId             String
+  instructorId          String
+  aircraftId            String
+  departureLocationId   String
+  destinationLocationId String?
+  scheduledTime         DateTime
+  durationMinutes       Int
+  status                BookingStatus @default(SCHEDULED)
+  originalBookingId     String?
+  
+  student             Student        @relation(fields: [studentId], references: [id])
+  instructor          Instructor     @relation(fields: [instructorId], references: [id])
+  aircraft            Aircraft       @relation(fields: [aircraftId], references: [id])
+  departureLocation   Location       @relation("DepartureLocation", fields: [departureLocationId], references: [id])
+  destinationLocation Location?      @relation("DestinationLocation", fields: [destinationLocationId], references: [id])
+  originalBooking     Booking?       @relation("RescheduleChain", fields: [originalBookingId], references: [id])
+  
+  reschedules        Booking[]          @relation("RescheduleChain")
+  weatherChecks      WeatherCheck[]
+  rescheduleOptions  RescheduleOption[]
+  notifications      Notification[]
+  events             Event[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([scheduledTime])
+  @@index([studentId])
+  @@index([status])
+  @@index([departureLocationId])
+}
+
+model WeatherCheck {
+  id              String   @id @default(uuid())
+  bookingId       String
+  locationId      String
+  checkTime       DateTime @default(now())
+  forecastTime    DateTime
+  visibilityMiles Decimal  @db.Decimal(5, 2)
+  ceilingFeet     Int?
+  windSpeedKnots  Int
+  windGustKnots   Int?
+  conditions      Json
+  rawData         Json
+  isSafe          Boolean
+  violatedMinimums String[]
+  
+  booking  Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id])
+  
+  createdAt DateTime @default(now())
+  
+  @@index([bookingId])
+  @@index([checkTime])
+  @@index([isSafe])
+}
+
+model RescheduleOption {
+  id                String   @id @default(uuid())
+  conflictEventId   String
+  originalBookingId String
+  proposedTime      DateTime
+  weatherForecast   Json
+  aiScore           Decimal  @db.Decimal(3, 2)
+  aiReasoning       String
+  status            String   @default("pending")
+  
+  originalBooking Booking @relation(fields: [originalBookingId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([originalBookingId])
+  @@index([status])
+}
+
+model Event {
+  id            String @id @default(uuid())
+  eventType     String
+  aggregateId   String
+  aggregateType String
+  payload       Json
+  metadata      Json?
+  
+  booking Booking? @relation(fields: [aggregateId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([aggregateType, aggregateId])
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+model Notification {
+  id               String    @id @default(uuid())
+  recipientId      String
+  channel          String
+  type             String
+  subject          String?
+  body             String
+  status           String    @default("pending")
+  sentAt           DateTime?
+  retryCount       Int       @default(0)
+  errorMessage     String?
+  relatedBookingId String?
+  
+  recipient      Student  @relation(fields: [recipientId], references: [id])
+  relatedBooking Booking? @relation(fields: [relatedBookingId], references: [id], onDelete: SetNull)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([recipientId])
+  @@index([status])
+  @@index([createdAt])
+}
+
