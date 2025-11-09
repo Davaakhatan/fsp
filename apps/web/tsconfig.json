@@ -30,11 +30,6 @@
       "@fsp/database": ["../../packages/database/src"]
     }
   },
-  "include": ["src"],
-  "references": [
-    { "path": "./tsconfig.node.json" },
-    { "path": "../../packages/shared" },
-    { "path": "../../packages/database" }
-  ]
+  "include": ["src"]
 }
 
