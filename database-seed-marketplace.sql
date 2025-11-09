@@ -135,15 +135,15 @@ INSERT INTO reviews (id, school_id, student_name, program_completed, rating, tit
 ('b2222222-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222', 'Robert Taylor', 'ir', 4.5, 'Good instrument program', 'Great instructors with lots of real-world experience. Aircraft are older but well-maintained.', 5.0, 4.0, 4.0, 4.5, 4.5, TRUE, TRUE);
 
 -- Austin Flight School Reviews
-INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, is_verified, is_approved) VALUES
+INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, rating_value, rating_support, is_verified, is_approved) VALUES
 ('b3333331-3333-3333-3333-333333333333', '33333333-3333-3333-3333-333333333333', 'Emily Anderson', 'ppl', 4.3, 'Budget-friendly option', 'If you''re looking to save money, this is a great choice. The training is solid, just be patient with scheduling.', 4.0, 4.0, 3.5, 5.0, 4.0, TRUE, TRUE);
 
 -- Miami Flight Center Reviews
-INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, rating_value, is_verified, is_approved) VALUES
+INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, rating_value, rating_support, is_verified, is_approved) VALUES
 ('b5555551-5555-5555-5555-555555555555', '55555555-5555-5555-5555-555555555555', 'Carlos Rodriguez', 'ppl', 4.7, 'Great weather, great training', 'You can fly almost every day here! Finished my PPL in 4 months with no weather delays. The multi-engine training is excellent too.', 4.5, 4.5, 4.5, 4.5, 5.0, TRUE, TRUE);
 
 -- Chicago Flight Academy Reviews
-INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, rating_value, is_verified, is_approved) VALUES
+INSERT INTO reviews (id, school_id, student_name, program_completed, rating, title, review_text, rating_instructors, rating_aircraft, rating_facilities, rating_value, rating_support, is_verified, is_approved) VALUES
 ('b6666661-6666-6666-6666-666666666666', '66666666-6666-6666-6666-666666666666', 'Jessica Brown', 'ppl', 4.6, 'Professional and organized', 'Very well-organized school with professional staff. Weather can be challenging in winter but they make the most of good days.', 4.5, 4.5, 5.0, 4.5, 4.5, TRUE, TRUE);
 
 -- =====================================================
