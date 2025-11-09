@@ -423,7 +423,6 @@ export default function Bookings() {
                       Select date and time for your flight lesson
                     </p>
                   </div>
-                  </div>
 
                   {/* Departure Location */}
                   <div>
