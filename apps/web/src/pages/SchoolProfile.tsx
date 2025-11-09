@@ -5,9 +5,10 @@ import {
   Plane, Star, Check, AlertCircle, Calendar, Award, TrendingUp,
   MessageSquare, Send, ChevronLeft
 } from 'lucide-react';
-import { useSchool, useSchoolPrograms, useSchoolAircraft, useSchoolReviews, useSubmitInquiry } from '../hooks/useMarketplace';
+import { useSchool, useSchoolPrograms, useSchoolAircraft, useSchoolReviews } from '../hooks/useMarketplace';
 import { TrustBadge } from '../components/TrustBadge';
 import { useToast } from '../components/ToastProvider';
+import InquiryForm from '../components/InquiryForm';
 
 export const SchoolProfile: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -21,38 +22,8 @@ export const SchoolProfile: React.FC = () => {
   const { data: aircraft, isLoading: aircraftLoading } = useSchoolAircraft(school?.id || '');
   const { data: reviews, isLoading: reviewsLoading } = useSchoolReviews(school?.id || '');
 
-  // Inquiry form
-  const submitInquiry = useSubmitInquiry();
-  const [inquiryForm, setInquiryForm] = useState({
-    student_name: '',
-    student_email: '',
-    student_phone: '',
-    program_interest: '',
-    message: '',
-  });
-
-  const handleInquirySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!school) return;
-
-    try {
-      await submitInquiry.mutateAsync({
-        school_id: school.id,
-        ...inquiryForm,
-        source: 'profile_page',
-      });
-      showToast('success', 'Inquiry sent! The school will contact you soon.');
-      setShowInquiryForm(false);
-      setInquiryForm({
-        student_name: '',
-        student_email: '',
-        student_phone: '',
-        program_interest: '',
-        message: '',
-      });
-    } catch (error) {
-      showToast('error', 'Failed to send inquiry. Please try again.');
-    }
+  const handleInquirySuccess = () => {
+    showToast('success', 'Inquiry sent! The school will contact you soon.');
   };
 
   if (schoolLoading) {
@@ -493,100 +464,13 @@ export const SchoolProfile: React.FC = () => {
       </div>
 
       {/* Inquiry Modal */}
-      {showInquiryForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Request Information</h2>
-                <button
-                  onClick={() => setShowInquiryForm(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <AlertCircle className="h-6 w-6 text-gray-400" />
-                </button>
-              </div>
-
-              <form onSubmit={handleInquirySubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Your Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={inquiryForm.student_name}
-                    onChange={(e) => setInquiryForm({ ...inquiryForm, student_name: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                  <input
-                    type="email"
-                    required
-                    value={inquiryForm.student_email}
-                    onChange={(e) => setInquiryForm({ ...inquiryForm, student_email: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                  <input
-                    type="tel"
-                    value={inquiryForm.student_phone}
-                    onChange={(e) => setInquiryForm({ ...inquiryForm, student_phone: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Program Interest</label>
-                  <select
-                    value={inquiryForm.program_interest}
-                    onChange={(e) => setInquiryForm({ ...inquiryForm, program_interest: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
-                  >
-                    <option value="">Select a program...</option>
-                    {programs?.map((program) => (
-                      <option key={program.id} value={program.program_type}>
-                        {program.program_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                  <textarea
-                    rows={4}
-                    value={inquiryForm.message}
-                    onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
-                    placeholder="Tell us about your goals and what you'd like to know..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none resize-none"
-                  />
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  <button
-                    type="submit"
-                    disabled={submitInquiry.isPending}
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {submitInquiry.isPending ? 'Sending...' : 'Send Inquiry'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowInquiryForm(false)}
-                    className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
+      {showInquiryForm && school && (
+        <InquiryForm
+          schoolId={school.id}
+          schoolName={school.name}
+          onClose={() => setShowInquiryForm(false)}
+          onSuccess={handleInquirySuccess}
+        />
       )}
     </div>
   );
