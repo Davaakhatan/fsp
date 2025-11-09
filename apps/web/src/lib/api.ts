@@ -35,7 +35,6 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
     // Don't filter, just show all schools
     // The geocoding will kick in after the API call completes
   }
-  }
 
   // Program type filtering
   if (filters.program_types && filters.program_types.length > 0) {
