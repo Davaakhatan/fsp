@@ -15,15 +15,18 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ schoolId, schoolName, onClose, 
   const submitReview = useSubmitReview();
 
   const [formData, setFormData] = useState({
-    reviewer_name: '',
-    overall_rating: 0,
-    instruction_rating: 0,
-    aircraft_rating: 0,
-    facilities_rating: 0,
-    value_rating: 0,
+    student_name: '',
+    student_email: '',
+    rating: 0,
+    title: '',
     review_text: '',
-    would_recommend: true,
-    is_verified_student: false,
+    rating_instructors: 0,
+    rating_aircraft: 0,
+    rating_facilities: 0,
+    rating_value: 0,
+    rating_support: 0,
+    is_verified: false,
+    program_completed: '',
   });
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -31,8 +34,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ schoolId, schoolName, onClose, 
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    if (!formData.reviewer_name.trim()) errors.reviewer_name = 'Name is required';
-    if (formData.overall_rating === 0) errors.overall_rating = 'Please provide an overall rating';
+    if (!formData.student_name.trim()) errors.student_name = 'Name is required';
+    if (formData.rating === 0) errors.rating = 'Please provide an overall rating';
     if (!formData.review_text.trim()) errors.review_text = 'Review text is required';
     if (formData.review_text.trim().length < 50) errors.review_text = 'Review must be at least 50 characters';
     setValidationErrors(errors);
@@ -118,67 +121,67 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ schoolId, schoolName, onClose, 
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Reviewer Name */}
+            {/* Student Name */}
             <div>
-              <label htmlFor="reviewer_name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="student_name" className="block text-sm font-medium text-gray-700 mb-2">
                 Your Name
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
-                  id="reviewer_name"
-                  name="reviewer_name"
-                  value={formData.reviewer_name}
-                  onChange={(e) => setFormData({ ...formData, reviewer_name: e.target.value })}
+                  id="student_name"
+                  name="student_name"
+                  value={formData.student_name}
+                  onChange={(e) => setFormData({ ...formData, student_name: e.target.value })}
                   className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
-                    validationErrors.reviewer_name ? 'border-red-500' : 'border-gray-300'
+                    validationErrors.student_name ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your name"
                 />
               </div>
-              {validationErrors.reviewer_name && (
-                <p className="text-red-500 text-sm mt-1">{validationErrors.reviewer_name}</p>
+              {validationErrors.student_name && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.student_name}</p>
               )}
             </div>
 
             {/* Overall Rating */}
             <div>
               <RatingStars
-                rating={formData.overall_rating}
-                onChange={(value) => setFormData({ ...formData, overall_rating: value })}
-                name="overall_rating"
+                rating={formData.rating}
+                onChange={(value) => setFormData({ ...formData, rating: value })}
+                name="rating"
                 label="Overall Rating *"
               />
-              {validationErrors.overall_rating && (
-                <p className="text-red-500 text-sm mt-1">{validationErrors.overall_rating}</p>
+              {validationErrors.rating && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.rating}</p>
               )}
             </div>
 
             {/* Detailed Ratings */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <RatingStars
-                rating={formData.instruction_rating}
-                onChange={(value) => setFormData({ ...formData, instruction_rating: value })}
-                name="instruction_rating"
+                rating={formData.rating_instructors}
+                onChange={(value) => setFormData({ ...formData, rating_instructors: value })}
+                name="rating_instructors"
                 label="Instruction Quality"
               />
               <RatingStars
-                rating={formData.aircraft_rating}
-                onChange={(value) => setFormData({ ...formData, aircraft_rating: value })}
-                name="aircraft_rating"
+                rating={formData.rating_aircraft}
+                onChange={(value) => setFormData({ ...formData, rating_aircraft: value })}
+                name="rating_aircraft"
                 label="Aircraft Quality"
               />
               <RatingStars
-                rating={formData.facilities_rating}
-                onChange={(value) => setFormData({ ...formData, facilities_rating: value })}
-                name="facilities_rating"
+                rating={formData.rating_facilities}
+                onChange={(value) => setFormData({ ...formData, rating_facilities: value })}
+                name="rating_facilities"
                 label="Facilities"
               />
               <RatingStars
-                rating={formData.value_rating}
-                onChange={(value) => setFormData({ ...formData, value_rating: value })}
-                name="value_rating"
+                rating={formData.rating_value}
+                onChange={(value) => setFormData({ ...formData, rating_value: value })}
+                name="rating_value"
                 label="Value for Money"
               />
             </div>
@@ -212,22 +215,13 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ schoolId, schoolName, onClose, 
               </div>
             </div>
 
-            {/* Checkboxes */}
-            <div className="space-y-3">
+            {/* Checkbox */}
+            <div>
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={formData.would_recommend}
-                  onChange={(e) => setFormData({ ...formData, would_recommend: e.target.checked })}
-                  className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">I would recommend this school to others</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.is_verified_student}
-                  onChange={(e) => setFormData({ ...formData, is_verified_student: e.target.checked })}
+                  checked={formData.is_verified}
+                  onChange={(e) => setFormData({ ...formData, is_verified: e.target.checked })}
                   className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700">I am/was a student at this school</span>

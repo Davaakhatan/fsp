@@ -250,15 +250,18 @@ export async function submitInquiry(inquiry: {
 
 export async function submitReview(review: {
   school_id: string;
-  reviewer_name: string;
-  overall_rating: number;
-  instruction_rating?: number;
-  aircraft_rating?: number;
-  facilities_rating?: number;
-  value_rating?: number;
+  student_name: string;
+  student_email?: string;
+  rating: number;
+  title?: string;
   review_text: string;
-  would_recommend?: boolean;
-  is_verified_student?: boolean;
+  rating_instructors?: number;
+  rating_aircraft?: number;
+  rating_facilities?: number;
+  rating_value?: number;
+  rating_support?: number;
+  is_verified?: boolean;
+  program_completed?: string;
 }) {
   const { data, error } = await supabase
     .from('reviews')
