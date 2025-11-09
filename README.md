@@ -15,51 +15,45 @@ An intelligent, automated system that monitors weather conditions, detects confl
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Node.js 20+
-- pnpm 8+
-- Supabase account (free)
-- OpenAI API key
-- OpenWeatherMap API key
-
-### 1. Clone and Install
+### Option 1: Automated Setup (Recommended)
 
 ```bash
-git clone <your-repo>
-cd FSP
-pnpm install
+chmod +x scripts/quick-start.sh
+./scripts/quick-start.sh
 ```
 
-### 2. Set Up Environment
+### Option 2: Manual Setup
 
 ```bash
+# 1. Clone and install
+git clone https://github.com/Davaakhatan/fsp.git
+cd fsp
+pnpm install
+
+# 2. Configure environment
 cp .env.template .env.local
 # Edit .env.local with your API keys
-```
 
-Get your free API keys:
-- **Supabase**: https://supabase.com (Database)
-- **OpenAI**: https://platform.openai.com (AI)
-- **OpenWeatherMap**: https://openweathermap.org (Weather)
-- **Resend**: https://resend.com (Email)
-- **Upstash**: https://upstash.com (Redis + Cron - optional)
-
-### 3. Set Up Database
-
-```bash
+# 3. Setup database
 cd packages/database
 pnpm prisma migrate dev
 pnpm prisma db seed
-```
+cd ../..
 
-### 4. Start Development Server
-
-```bash
+# 4. Start development
 pnpm dev
 ```
 
-Visit http://localhost:3000
+Visit **http://localhost:3000** 🎉
+
+### Get API Keys (All FREE except OpenAI)
+
+1. **Supabase** (Database): https://supabase.com
+2. **OpenWeatherMap** (Weather): https://openweathermap.org
+3. **OpenAI** (AI ~$5-10/mo): https://platform.openai.com
+4. **Resend** (Email): https://resend.com
+
+See [Setup Guide](docs/setup.md) for detailed instructions.
 
 ## 📁 Project Structure
 
@@ -91,12 +85,15 @@ FSP/
 
 ## 📖 Documentation
 
-- [Setup Instructions](docs/setup.md) - Get started locally
-- [Local Testing Guide](docs/local-testing.md) - Test before deploying
-- [Development Roadmap](docs/roadmap.md) - Project progress
-- [Free Deployment Guide](docs/free-deployment-guide.md) - Deploy to Vercel
-- [Architecture](memory-bank/systemPatterns.md) - System design
-- [API Documentation](memory-bank/techContext.md) - Technical details
+- 🎉 [**Project Complete!**](docs/COMPLETE.md) - Summary & next steps
+- 📝 [Setup Instructions](docs/setup.md) - Get started locally
+- 🧪 [Local Testing Guide](docs/local-testing.md) - Test before deploying
+- ✅ [Deployment Checklist](docs/deployment-checklist.md) - Step-by-step deploy
+- 🗺️ [Development Roadmap](docs/roadmap.md) - Project progress
+- 📊 [Project Status](docs/project-status.md) - What's complete
+- 🚀 [Free Deployment Guide](docs/free-deployment-guide.md) - Deploy to Vercel
+- 🏗️ [Architecture](memory-bank/systemPatterns.md) - System design
+- 📚 [API Documentation](memory-bank/techContext.md) - Technical details
 
 ## 🧪 Testing
 
