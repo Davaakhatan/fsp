@@ -24,18 +24,15 @@ ALTER TABLE school_admins ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own school admin records"
   ON school_admins
   FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = school_admins.user_id);
 
 -- Policy: Platform admins can see all school admin records
 CREATE POLICY "Platform admins can view all school admin records"
   ON school_admins
   FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM auth.users
-      WHERE auth.users.id = auth.uid()
-      AND (auth.users.raw_user_meta_data->>'role')::text = 'admin'
-    )
+    (auth.jwt()->>'role')::text = 'admin' OR
+    (auth.jwt()->'user_metadata'->>'role')::text = 'admin'
   );
 
 -- Policy: Platform admins can insert school admin records
@@ -43,11 +40,8 @@ CREATE POLICY "Platform admins can create school admin records"
   ON school_admins
   FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM auth.users
-      WHERE auth.users.id = auth.uid()
-      AND (auth.users.raw_user_meta_data->>'role')::text = 'admin'
-    )
+    (auth.jwt()->>'role')::text = 'admin' OR
+    (auth.jwt()->'user_metadata'->>'role')::text = 'admin'
   );
 
 -- Policy: Platform admins can update school admin records
@@ -55,11 +49,8 @@ CREATE POLICY "Platform admins can update school admin records"
   ON school_admins
   FOR UPDATE
   USING (
-    EXISTS (
-      SELECT 1 FROM auth.users
-      WHERE auth.users.id = auth.uid()
-      AND (auth.users.raw_user_meta_data->>'role')::text = 'admin'
-    )
+    (auth.jwt()->>'role')::text = 'admin' OR
+    (auth.jwt()->'user_metadata'->>'role')::text = 'admin'
   );
 
 -- Policy: Platform admins can delete school admin records
@@ -67,11 +58,8 @@ CREATE POLICY "Platform admins can delete school admin records"
   ON school_admins
   FOR DELETE
   USING (
-    EXISTS (
-      SELECT 1 FROM auth.users
-      WHERE auth.users.id = auth.uid()
-      AND (auth.users.raw_user_meta_data->>'role')::text = 'admin'
-    )
+    (auth.jwt()->>'role')::text = 'admin' OR
+    (auth.jwt()->'user_metadata'->>'role')::text = 'admin'
   );
 
 -- Success message
