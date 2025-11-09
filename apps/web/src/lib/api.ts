@@ -8,6 +8,8 @@ const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5175';
 // =====================================================
 
 export async function searchSchools(filters: SearchFilters = {}): Promise<SchoolSummary[]> {
+  console.log('🔍 Search filters:', filters);
+  
   let query = supabase
     .from('school_summary')
     .select('*');
@@ -16,6 +18,7 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
   if (filters.latitude && filters.longitude && filters.radius_miles) {
     // PostGIS distance query
     const radiusMeters = filters.radius_miles * 1609.34;
+    console.log('📍 Using PostGIS radius search');
     query = query.rpc('schools_within_radius', {
       search_lat: filters.latitude,
       search_lon: filters.longitude,
@@ -25,9 +28,9 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
 
   // City/State search (text-based location search)
   if (filters.location && !filters.latitude) {
-    // Use textSearch or simple string matching
-    // PostgREST doesn't handle % wildcards well in ilike via URL params
-    query = query.or(`city.ilike.*${filters.location}*,state.ilike.*${filters.location}*`);
+    console.log('🔤 Using text search for:', filters.location);
+    // Split the OR conditions for better compatibility
+    query = query.or(`city.ilike.*${filters.location}*,state.ilike.*${filters.location}*,name.ilike.*${filters.location}*`);
   }
 
   // Program type filtering
