@@ -109,3 +109,15 @@ export function useGeocoding(location: string) {
   });
 }
 
+// =====================================================
+// COMPARISON
+// =====================================================
+
+export function useSchoolComparison(schoolIds: string[]) {
+  return useQuery({
+    queryKey: ['schools', 'comparison', schoolIds.join(',')],
+    queryFn: () => api.compareSchools(schoolIds),
+    enabled: schoolIds.length > 0,
+  });
+}
+
