@@ -1,17 +1,21 @@
 -- Clean up old booking/weather system tables
 -- Run this FIRST before running database-schema.sql
+-- NOTE: Some tables overlap with marketplace schema (aircraft, instructors)
+-- We keep the marketplace versions and only clean up booking system tables
 
--- Drop tables (in order to avoid foreign key constraints)
+-- Drop booking system specific tables
 DROP TABLE IF EXISTS audit_logs CASCADE;
+DROP TABLE IF EXISTS events CASCADE;
 DROP TABLE IF EXISTS notifications CASCADE;
 DROP TABLE IF EXISTS reschedule_options CASCADE;
 DROP TABLE IF EXISTS weather_alerts CASCADE;
 DROP TABLE IF EXISTS weather_conditions CASCADE;
 DROP TABLE IF EXISTS flight_bookings CASCADE;
-DROP TABLE IF EXISTS aircraft CASCADE;
 DROP TABLE IF EXISTS locations CASCADE;
-DROP TABLE IF EXISTS instructors CASCADE;
 DROP TABLE IF EXISTS students CASCADE;
+
+-- NOTE: We do NOT drop 'aircraft' and 'instructors' because they're used by marketplace
+-- The old schema will fail if these exist, so we need to modify database-schema.sql instead
 
 -- Drop ENUM types
 DROP TYPE IF EXISTS booking_status CASCADE;
