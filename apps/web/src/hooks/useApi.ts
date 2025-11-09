@@ -1,5 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Booking } from '@fsp/shared';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 
 // Fetch bookings directly from Supabase

@@ -1,4 +1,4 @@
-import { WeatherData, WeatherMinimums, TrainingLevel, Location } from '@fsp/shared';
+import { WeatherData, TrainingLevel, Location } from '@fsp/shared';
 import { WEATHER_MINIMUMS, CACHE_TTL } from '@fsp/shared';
 
 interface OpenWeatherResponse {
