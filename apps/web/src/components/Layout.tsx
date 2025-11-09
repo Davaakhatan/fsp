@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, userRole, isAdmin, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const isActive = (path: string) => location.pathname === path;
@@ -64,9 +64,26 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               {/* Auth Buttons */}
               {user ? (
                 <div className="flex items-center space-x-3 pl-4 border-l border-gray-300">
+                  {isAdmin && (
+                    <Link
+                      to="/admin/dashboard"
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all ${
+                        location.pathname.startsWith('/admin')
+                          ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      <User className="h-4 w-4" />
+                      <span>Admin</span>
+                    </Link>
+                  )}
                   <Link
                     to="/portal/dashboard"
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl font-medium text-gray-700 hover:bg-gray-100 transition-all"
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all ${
+                      location.pathname.startsWith('/portal')
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
                   >
                     <User className="h-4 w-4" />
                     <span>Portal</span>
