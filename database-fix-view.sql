@@ -4,8 +4,10 @@
 -- Run this in Supabase SQL Editor IMMEDIATELY
 -- =====================================================
 
--- Create the school_summary view (used by search)
-CREATE OR REPLACE VIEW school_summary AS
+-- Drop and recreate the school_summary view with FSP fields
+DROP VIEW IF EXISTS school_summary;
+
+CREATE VIEW school_summary AS
 SELECT 
   s.id,
   s.name,
