@@ -115,9 +115,9 @@ INSERT INTO aircraft (id, school_id, registration, make, model, year, category, 
 -- =====================================================
 
 INSERT INTO simulators (id, school_id, name, type, manufacturer, model, simulated_aircraft, has_motion, faa_approved, loggable_hours, hourly_rate) VALUES
-('s1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Redbird FMX', 'aatd', 'Redbird', 'FMX', 'Cessna 172', TRUE, TRUE, TRUE, 75),
-('s2222221-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222', 'Frasca 141', 'batd', 'Frasca', '141', 'Generic Single-Engine', FALSE, TRUE, TRUE, 50),
-('s6666661-6666-6666-6666-666666666666', '66666666-6666-6666-6666-666666666666', 'Precision Flight Controls', 'aatd', 'Precision', 'PFTC-142', 'Cessna 172SP', FALSE, TRUE, TRUE, 65);
+('c1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Redbird FMX', 'aatd', 'Redbird', 'FMX', 'Cessna 172', TRUE, TRUE, TRUE, 75),
+('c2222221-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222', 'Frasca 141', 'batd', 'Frasca', '141', 'Generic Single-Engine', FALSE, TRUE, TRUE, 50),
+('c6666661-6666-6666-6666-666666666666', '66666666-6666-6666-6666-666666666666', 'Precision Flight Controls', 'aatd', 'Precision', 'PFTC-142', 'Cessna 172SP', FALSE, TRUE, TRUE, 65);
 
 -- =====================================================
 -- 5. REVIEWS
