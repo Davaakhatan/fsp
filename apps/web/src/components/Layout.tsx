@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Sparkles, Calculator, Menu, X, LogIn, LogOut, User, ChevronDown, LayoutDashboard, Calendar, CloudRain, Mail, Star } from 'lucide-react';
+import { Search, Sparkles, Calculator, Menu, X, LogIn, LogOut, User, ChevronDown, Mail, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -20,11 +20,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   ];
 
   const portalLinks = [
-    { path: '/portal/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/portal/inquiries', label: 'Inquiries', icon: Mail },
     { path: '/portal/reviews', label: 'Reviews', icon: Star },
-    { path: '/portal/bookings', label: 'Bookings', icon: Calendar },
-    { path: '/portal/weather', label: 'Weather Alerts', icon: CloudRain },
   ];
 
   const handleSignOut = async () => {
