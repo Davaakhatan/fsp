@@ -25,8 +25,9 @@ export async function searchSchools(filters: SearchFilters = {}): Promise<School
 
   // City/State search (text-based location search)
   if (filters.location && !filters.latitude) {
-    const searchTerm = `%${filters.location}%`;
-    query = query.or(`city.ilike.${searchTerm},state.ilike.${searchTerm}`);
+    // Use textSearch or simple string matching
+    // PostgREST doesn't handle % wildcards well in ilike via URL params
+    query = query.or(`city.ilike.*${filters.location}*,state.ilike.*${filters.location}*`);
   }
 
   // Program type filtering
