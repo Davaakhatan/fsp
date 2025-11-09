@@ -28,15 +28,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Fetch school_id for school admins
   const fetchSchoolId = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('school_admins')
-      .select('school_id')
-      .eq('user_id', userId)
-      .single();
-    
-    if (!error && data) {
-      setSchoolId(data.school_id);
-    } else {
+    try {
+      const { data, error } = await supabase
+        .from('school_admins')
+        .select('school_id')
+        .eq('user_id', userId)
+        .maybeSingle(); // Use maybeSingle() instead of single() to handle no rows gracefully
+      
+      if (error) {
+        console.error('Error fetching school_id:', error);
+        setSchoolId(null);
+        return;
+      }
+      
+      if (data) {
+        setSchoolId(data.school_id);
+      } else {
+        setSchoolId(null);
+      }
+    } catch (err) {
+      console.error('Exception fetching school_id:', err);
       setSchoolId(null);
     }
   };
