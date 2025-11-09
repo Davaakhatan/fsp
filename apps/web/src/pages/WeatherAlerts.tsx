@@ -213,7 +213,7 @@ export default function WeatherAlerts() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-3">
                       <h3 className="text-xl font-bold text-gray-900">
-                        {alert.severity} Weather Alert
+                        {alert.title}
                       </h3>
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getSeverityStyle(alert.severity)}`}>
                         {alert.severity}
@@ -225,55 +225,33 @@ export default function WeatherAlerts() {
                         <MapPin className="h-5 w-5 text-gray-400" />
                         <div>
                           <div className="text-xs text-gray-500">Location</div>
-                          <div className="font-medium">{alert.booking?.location || 'Unknown Location'}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <User className="h-5 w-5 text-gray-400" />
-                        <div>
-                          <div className="text-xs text-gray-500">Student</div>
-                          <div className="font-medium">{alert.booking?.studentName || 'Unknown Student'}</div>
+                          <div className="font-medium">{alert.location?.name || 'Unknown Location'}</div>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2 text-gray-700">
                         <Clock className="h-5 w-5 text-gray-400" />
                         <div>
-                          <div className="text-xs text-gray-500">Detected At</div>
-                          <div className="font-medium">{formatDateTime(alert.detectedAt)}</div>
+                          <div className="text-xs text-gray-500">Created At</div>
+                          <div className="font-medium">{formatDateTime(alert.createdAt)}</div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <Plane className="h-5 w-5 text-gray-400" />
+                      <div className="flex items-center gap-2 text-gray-700 md:col-span-2">
+                        <AlertCircle className="h-5 w-5 text-gray-400" />
                         <div>
-                          <div className="text-xs text-gray-500">Scheduled Time</div>
-                          <div className="font-medium">
-                            {alert.booking?.scheduledTime 
-                              ? formatDateTime(alert.booking.scheduledTime)
-                              : 'N/A'}
-                          </div>
+                          <div className="text-xs text-gray-500">Affected Bookings</div>
+                          <div className="font-medium">{alert.affectedBookingsCount || 0} flights</div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Violated Minimums */}
+                    {/* Alert Description */}
                     <div className="mb-3">
-                      <p className="text-xs text-gray-500 mb-2">Violated Minimums:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {alert.violatedMinimums?.map((minimum: string, index: number) => (
-                          <span
-                            key={index}
-                            className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-sm font-medium bg-red-100 text-red-800 border border-red-200"
-                          >
-                            {minimum.includes('Visibility') && <Eye className="h-3 w-3" />}
-                            {minimum.includes('Wind') && <Wind className="h-3 w-3" />}
-                            {minimum.includes('Ceiling') && <Cloud className="h-3 w-3" />}
-                            {minimum}
-                          </span>
-                        ))}
-                      </div>
+                      <p className="text-xs text-gray-500 mb-2">Details:</p>
+                      <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        {alert.description || 'No additional details available.'}
+                      </p>
                     </div>
 
                     <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
@@ -327,37 +305,27 @@ export default function WeatherAlerts() {
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Location</p>
-                  <p className="font-semibold text-gray-900">{selectedAlert.booking?.location || 'N/A'}</p>
+                  <p className="font-semibold text-gray-900">{selectedAlert.location?.name || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Student</p>
-                  <p className="font-semibold text-gray-900">{selectedAlert.booking?.studentName || 'N/A'}</p>
+                  <p className="text-sm text-gray-500 mb-1">Location Code</p>
+                  <p className="font-semibold text-gray-900">{selectedAlert.location?.code || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Detected At</p>
-                  <p className="font-semibold text-gray-900">{formatDateTime(selectedAlert.detectedAt)}</p>
+                  <p className="text-sm text-gray-500 mb-1">Created At</p>
+                  <p className="font-semibold text-gray-900">{formatDateTime(selectedAlert.createdAt)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Status</p>
-                  <p className="font-semibold text-gray-900">Active</p>
+                  <p className="text-sm text-gray-500 mb-1">Affected Bookings</p>
+                  <p className="font-semibold text-gray-900">{selectedAlert.affectedBookingsCount || 0} flights</p>
                 </div>
               </div>
 
-              {/* Violated Minimums */}
+              {/* Alert Description */}
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-3">Violated Weather Minimums:</p>
-                <div className="space-y-2">
-                  {selectedAlert.violatedMinimums?.map((minimum: string, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg"
-                    >
-                      {minimum.includes('Visibility') && <Eye className="h-5 w-5 text-red-600" />}
-                      {minimum.includes('Wind') && <Wind className="h-5 w-5 text-red-600" />}
-                      {minimum.includes('Ceiling') && <Cloud className="h-5 w-5 text-red-600" />}
-                      <span className="font-medium text-red-900">{minimum}</span>
-                    </div>
-                  ))}
+                <p className="text-sm font-medium text-gray-700 mb-3">Alert Details:</p>
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-gray-800">{selectedAlert.description || 'No additional details available.'}</p>
                 </div>
               </div>
 
