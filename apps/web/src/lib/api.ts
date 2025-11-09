@@ -263,13 +263,32 @@ export async function submitReview(review: {
   is_verified?: boolean;
   program_completed?: string;
 }) {
+  // Only include optional ratings if they're > 0 (to avoid CHECK constraint violations)
+  const reviewData: any = {
+    school_id: review.school_id,
+    student_name: review.student_name,
+    rating: review.rating,
+    review_text: review.review_text,
+    is_approved: false,
+    helpful_count: 0,
+  };
+
+  // Add optional fields only if they have values
+  if (review.student_email) reviewData.student_email = review.student_email;
+  if (review.title) reviewData.title = review.title;
+  if (review.is_verified !== undefined) reviewData.is_verified = review.is_verified;
+  if (review.program_completed) reviewData.program_completed = review.program_completed;
+  
+  // Only add rating fields if they're > 0 (to satisfy CHECK constraints)
+  if (review.rating_instructors && review.rating_instructors > 0) reviewData.rating_instructors = review.rating_instructors;
+  if (review.rating_aircraft && review.rating_aircraft > 0) reviewData.rating_aircraft = review.rating_aircraft;
+  if (review.rating_facilities && review.rating_facilities > 0) reviewData.rating_facilities = review.rating_facilities;
+  if (review.rating_value && review.rating_value > 0) reviewData.rating_value = review.rating_value;
+  if (review.rating_support && review.rating_support > 0) reviewData.rating_support = review.rating_support;
+
   const { data, error } = await supabase
     .from('reviews')
-    .insert([{
-      ...review,
-      is_approved: false, // All reviews start as unapproved
-      helpful_count: 0,
-    }])
+    .insert([reviewData])
     .select()
     .single();
 

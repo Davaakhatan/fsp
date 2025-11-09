@@ -1,10 +1,14 @@
 -- Fix RLS policies for reviews table - Allow public submissions
 
--- Drop existing policies
-DROP POLICY IF EXISTS "Anyone can read approved reviews" ON reviews;
-DROP POLICY IF EXISTS "Authenticated users can submit reviews" ON reviews;
-DROP POLICY IF EXISTS "School admins can view all reviews for their school" ON reviews;
-DROP POLICY IF EXISTS "School admins can update reviews for their school" ON reviews;
+-- Drop ALL existing policies first
+DO $$ 
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN (SELECT policyname FROM pg_policies WHERE tablename = 'reviews') LOOP
+        EXECUTE 'DROP POLICY IF EXISTS "' || r.policyname || '" ON reviews';
+    END LOOP;
+END $$;
 
 -- Enable RLS
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
