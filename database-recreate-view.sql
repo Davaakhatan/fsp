@@ -4,7 +4,7 @@
 -- Step 1: Drop existing view if it exists
 DROP VIEW IF EXISTS school_summary CASCADE;
 
--- Step 2: Create the view
+-- Step 2: Create the view (with correct column names from actual schema)
 CREATE VIEW school_summary AS
 SELECT 
   s.id,
@@ -26,7 +26,7 @@ SELECT
   s.fsp_avg_hours_to_ir,
   s.fsp_cancellation_rate,
   s.fsp_schedule_reliability,
-  s.fsp_fleet_utilization,
+  s.fsp_student_satisfaction,
   COUNT(DISTINCT p.id) as total_programs,
   COALESCE(AVG(r.rating_overall), 0) as avg_rating,
   COUNT(DISTINCT r.id) as total_reviews,
@@ -43,7 +43,7 @@ GROUP BY
   s.is_part_61, s.is_part_141, s.is_veteran_approved,
   s.fsp_avg_hours_to_ppl, s.fsp_avg_hours_to_ir,
   s.fsp_cancellation_rate, s.fsp_schedule_reliability,
-  s.fsp_fleet_utilization;
+  s.fsp_student_satisfaction;
 
 -- Step 3: Create PostGIS function for radius search
 CREATE OR REPLACE FUNCTION schools_within_radius(
@@ -71,7 +71,7 @@ RETURNS TABLE (
   fsp_avg_hours_to_ir DECIMAL,
   fsp_cancellation_rate DECIMAL,
   fsp_schedule_reliability DECIMAL,
-  fsp_fleet_utilization DECIMAL,
+  fsp_student_satisfaction DECIMAL,
   total_programs BIGINT,
   avg_rating DECIMAL,
   total_reviews BIGINT,
