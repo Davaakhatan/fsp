@@ -1,9 +1,12 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Search, Sparkles, Calculator, Menu, X } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Search, Sparkles, Calculator, Menu, X, LogIn, LogOut, User } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const isActive = (path: string) => location.pathname === path;
@@ -13,6 +16,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     { path: '/find-match', label: 'Find My Match', icon: Sparkles },
     { path: '/financing', label: 'Financing', icon: Calculator },
   ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -34,21 +42,60 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-1">
-              {navLinks.map(({ path, label, icon: Icon }) => (
-                <Link
-                  key={path}
-                  to={path}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all ${
-                    isActive(path)
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{label}</span>
-                </Link>
-              ))}
+            <nav className="hidden md:flex items-center space-x-4">
+              {/* Marketplace Links */}
+              <div className="flex items-center space-x-1">
+                {navLinks.map(({ path, label, icon: Icon }) => (
+                  <Link
+                    key={path}
+                    to={path}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all ${
+                      isActive(path)
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{label}</span>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Auth Buttons */}
+              {user ? (
+                <div className="flex items-center space-x-3 pl-4 border-l border-gray-300">
+                  <Link
+                    to="/portal/dashboard"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl font-medium text-gray-700 hover:bg-gray-100 transition-all"
+                  >
+                    <User className="h-4 w-4" />
+                    <span>Portal</span>
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl font-medium text-gray-700 hover:bg-gray-100 transition-all"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2 pl-4 border-l border-gray-300">
+                  <Link
+                    to="/signin"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl font-medium text-gray-700 hover:bg-gray-100 transition-all"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    <span>Sign In</span>
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl font-medium bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl transition-all"
+                  >
+                    <span>Get Started</span>
+                  </Link>
+                </div>
+              )}
             </nav>
 
             {/* Mobile Menu Button */}

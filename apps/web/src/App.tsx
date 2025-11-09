@@ -7,9 +7,16 @@ import { SchoolProfile } from './pages/SchoolProfile';
 import { Comparison } from './pages/Comparison';
 import { AIMatching } from './pages/AIMatching';
 import { FinancingHub } from './pages/FinancingHub';
+import { SignIn } from './pages/SignIn';
+import { SignUp } from './pages/SignUp';
+import Dashboard from './pages/Dashboard';
+import Bookings from './pages/Bookings';
+import WeatherAlerts from './pages/WeatherAlerts';
 import { Layout } from './components/Layout';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/ToastProvider';
+import { AuthProvider } from './contexts/AuthContext';
 import './index.css';
 
 const queryClient = new QueryClient({
@@ -27,18 +34,28 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
-          <Router>
-            <Layout>
+          <AuthProvider>
+            <Router>
               <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/search" element={<SearchResults />} />
-                <Route path="/schools/:slug" element={<SchoolProfile />} />
-                <Route path="/compare" element={<Comparison />} />
-                <Route path="/find-match" element={<AIMatching />} />
-                <Route path="/financing" element={<FinancingHub />} />
+                {/* Public Routes - Marketplace */}
+                <Route path="/" element={<Layout><HomePage /></Layout>} />
+                <Route path="/search" element={<Layout><SearchResults /></Layout>} />
+                <Route path="/schools/:slug" element={<Layout><SchoolProfile /></Layout>} />
+                <Route path="/compare" element={<Layout><Comparison /></Layout>} />
+                <Route path="/find-match" element={<Layout><AIMatching /></Layout>} />
+                <Route path="/financing" element={<Layout><FinancingHub /></Layout>} />
+                
+                {/* Auth Routes */}
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/signup" element={<SignUp />} />
+                
+                {/* Protected Routes - School Portal */}
+                <Route path="/portal/dashboard" element={<Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout>} />
+                <Route path="/portal/bookings" element={<Layout><ProtectedRoute><Bookings /></ProtectedRoute></Layout>} />
+                <Route path="/portal/weather" element={<Layout><ProtectedRoute><WeatherAlerts /></ProtectedRoute></Layout>} />
               </Routes>
-            </Layout>
-          </Router>
+            </Router>
+          </AuthProvider>
         </ToastProvider>
       </QueryClientProvider>
     </ErrorBoundary>
