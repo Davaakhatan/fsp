@@ -212,11 +212,9 @@ export const AIMatching: React.FC = () => {
 
   const currentQuestion = questions[step];
 
-  // Safety check
-  if (!currentQuestion) {
-    return null;
-  }
+  console.log('🎯 AI Matching State:', { step, questionsLength: questions.length, hasMatches: matches.length > 0, currentQuestion: !!currentQuestion });
 
+  // Early return for matches view
   if (matches.length > 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12">
@@ -339,7 +337,7 @@ export const AIMatching: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        {step < questions.length ? (
+        {step < questions.length && currentQuestion ? (
           <>
             {/* Progress */}
             <div className="mb-8">
@@ -359,12 +357,12 @@ export const AIMatching: React.FC = () => {
             <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
               <div className="flex items-center space-x-4 mb-6">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                  <currentQuestion.icon className="h-8 w-8 text-white" />
+                  {currentQuestion && <currentQuestion.icon className="h-8 w-8 text-white" />}
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900">{currentQuestion.title}</h2>
+                <h2 className="text-3xl font-bold text-gray-900">{currentQuestion?.title}</h2>
               </div>
 
-              {currentQuestion.type === 'range' ? (
+              {currentQuestion?.type === 'range' ? (
                 <div className="space-y-4">
                   <input
                     type="range"
